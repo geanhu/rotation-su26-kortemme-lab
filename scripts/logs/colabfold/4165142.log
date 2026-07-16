@@ -1,0 +1,82 @@
+Start: Mon Jul 13 03:42:30 PDT 2026
+qb3-atgpu2.wynton.ucsf.edu
+==============================================================
+job_number:                 4165142
+exec_file:                  job_scripts/4165142
+submission_time:            Mon Jul 13 01:22:57 2026
+owner:                      geanhu
+uid:                        64854
+group:                      wynton-rotation
+gid:                        60001
+sge_o_home:                 /wynton/home/rotation/geanhu
+sge_o_log_name:             geanhu
+sge_o_path:                 /wynton/home/cbi/shared/software/CBI/miniforge3-26.3.2-2/condabin:/wynton/home/cbi/shared/software/CBI/miniforge3-26.3.2-2/bin:/wynton/home/ferrin/goddard/localcolabfold/localcolabfold/colabfold-conda/bin:/wynton/home/rotation/geanhu/.local/bin:/wynton/home/rotation/geanhu/bin:/opt/sge/bin:/opt/sge/bin/lx-amd64:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/wynton/home/kortemme/xingjiepan/Softwares/Rosetta/Rosetta/main/source/bin
+sge_o_shell:                /bin/bash
+sge_o_workdir:              /wynton/home/rotation/geanhu/multi-state/scripts
+sge_o_host:                 dev3
+account:                    sge
+cwd:                        /wynton/home/rotation/geanhu/multi-state/scripts
+merge:                      y
+hard resource_list:         compute_cap=80,gpu_mem=40G,h_rt=43200,mem_free=32G,scratch=32G,hostname=!qb3-idgpu18&!qb3-atgpu4
+mail_list:                  geanhu@dev3.wynton.ucsf.edu
+notify:                     FALSE
+job_name:                   fold
+stdout_path_list:           NONE:NONE:logs/colabfold/$JOB_ID.log
+jobshare:                   0
+hard_queue_list:            gpu.q
+shell_list:                 NONE:/bin/bash
+env_list:                   TERM=NONE
+script_file:                colabfold.sh
+parallel environment:  smp range: 1
+project:                    wynton-rotation
+binding:                    NONE
+job_type:                   NONE
+usage         1:            cpu=00:00:00, mem=0.00000 GB s, io=0.00000 GB, vmem=N/A, maxvmem=N/A
+binding       1:            NONE
+scheduling info:            (Collecting of scheduler job information is turned off)
+------Start of script-------
+#!/bin/bash
+#$ -S /bin/bash
+#$ -q gpu.q
+#$ -pe smp 1
+#$ -l compute_cap=80,gpu_mem=40G
+#$ -cwd
+#$ -N fold
+#$ -o logs/colabfold/$JOB_ID.log
+#$ -j y
+#$ -l h_rt=12:00:00
+#$ -l mem_free=32G
+#$ -l scratch=32G
+#$ -l h=!qb3-idgpu18&!qb3-atgpu4
+
+# metadata
+echo "Start: $(date)"
+echo "$(hostname)"
+[[ -n "$JOB_ID" ]] && qstat -j "$JOB_ID"
+echo "------Start of script-------"
+cat "$0"
+echo ""
+echo "-------End of script---------"
+
+# run
+exec colabfold_batch \
+    --num-recycle 3 \
+    --msa-mode single_sequence \
+    --random-seed 42 \
+    --num-seeds 1 \
+    $HOME/mpnn-output/5KPE-5KPH_bias/seqs/seqs.csv \
+    $HOME/multi-state/data/colabfold-output/5KPE-5KPH/
+
+# end
+echo "End: $(date)"
+echo "-----------"
+-------End of script---------
+2026-07-13 03:45:20,395 Running colabfold 1.5.5 (a00ce1bcc477491d7693e3816d21ea3fc2cf40fd)
+Traceback (most recent call last):
+  File "/wynton/home/ferrin/goddard/localcolabfold/localcolabfold/colabfold-conda/bin/colabfold_batch", line 8, in <module>
+    sys.exit(main())
+  File "/wynton/home/ferrin/goddard/localcolabfold/localcolabfold/colabfold-conda/lib/python3.10/site-packages/colabfold/batch.py", line 2013, in main
+    queries, is_complex = get_queries(args.input, args.sort_queries_by)
+  File "/wynton/home/ferrin/goddard/localcolabfold/localcolabfold/colabfold-conda/lib/python3.10/site-packages/colabfold/batch.py", line 584, in get_queries
+    raise OSError(f"{input_path} could not be found")
+OSError: /wynton/home/rotation/geanhu/mpnn-output/5KPE-5KPH_bias/seqs/seqs.csv could not be found

@@ -1,0 +1,136 @@
+Start: Mon Jul 13 00:11:29 PDT 2026
+qb3-atgpu4.wynton.ucsf.edu
+==============================================================
+job_number:                 4165083
+exec_file:                  job_scripts/4165083
+submission_time:            Mon Jul 13 00:11:07 2026
+owner:                      geanhu
+uid:                        64854
+group:                      wynton-rotation
+gid:                        60001
+sge_o_home:                 /wynton/home/rotation/geanhu
+sge_o_log_name:             geanhu
+sge_o_path:                 /wynton/home/cbi/shared/software/CBI/miniforge3-26.3.2-2/condabin:/wynton/home/cbi/shared/software/CBI/miniforge3-26.3.2-2/bin:/wynton/home/ferrin/goddard/localcolabfold/localcolabfold/colabfold-conda/bin:/wynton/home/rotation/geanhu/.local/bin:/wynton/home/rotation/geanhu/bin:/opt/sge/bin:/opt/sge/bin/lx-amd64:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/wynton/home/kortemme/xingjiepan/Softwares/Rosetta/Rosetta/main/source/bin
+sge_o_shell:                /bin/bash
+sge_o_workdir:              /wynton/home/rotation/geanhu/multi-state/scripts
+sge_o_host:                 dev3
+account:                    sge
+cwd:                        /wynton/home/rotation/geanhu/multi-state/scripts
+merge:                      y
+hard resource_list:         compute_cap=61,gpu_mem=6000M,h_rt=300,mem_free=32G,scratch=32G,hostname=!(qb3-idgpu18)
+mail_list:                  geanhu@dev3.wynton.ucsf.edu
+notify:                     FALSE
+job_name:                   diffusion
+stdout_path_list:           NONE:NONE:logs/rfdiffusion/$JOB_ID.log
+jobshare:                   0
+hard_queue_list:            gpu.q
+shell_list:                 NONE:/bin/bash
+env_list:                   TERM=NONE
+script_file:                rfdiffusion.sh
+parallel environment:  smp range: 1
+project:                    wynton-rotation
+binding:                    NONE
+job_type:                   NONE
+usage         1:            cpu=00:00:00, mem=0.00000 GB s, io=0.00000 GB, vmem=N/A, maxvmem=N/A
+binding       1:            NONE
+scheduling info:            (Collecting of scheduler job information is turned off)
+------Start of script-------
+#!/bin/bash
+#$ -S /bin/bash
+#$ -q gpu.q
+#$ -pe smp 1
+#$ -l compute_cap=61,gpu_mem=6000M
+#$ -cwd
+#$ -N diffusion
+#$ -o logs/rfdiffusion/$JOB_ID.log
+#$ -j y
+#$ -l h_rt=00:05:00
+#$ -l mem_free=32G
+#$ -l scratch=32G
+#$ -l h=!(qb3-idgpu18)
+##$ -t 1-159
+
+# metadata
+echo "Start: $(date)"
+echo "$(hostname)"
+[[ -n "$JOB_ID" ]] && qstat -j "$JOB_ID"
+echo "------Start of script-------"
+cat "$0"
+echo ""
+echo "-------End of script---------"
+
+# setup env
+module load CBI miniforge3
+conda activate SE3nv
+
+echo $CUDA_VISIBLE_DEVICES
+export CUDA_VISIBLE_DEVICES=$SGE_GPU
+echo $CUDA_VISIBLE_DEVICES
+
+nvidia-smi
+nvidia-smi -L
+python -c "import torch; print(torch.cuda.is_available()); print(torch.cuda.device_count())"
+ls -l /dev/nvidia*
+
+'''
+# create array job settings
+input_dir="$HOME/multi-state/data/string-sampling/end-states/"
+pdb_list="${input_dir}/5kpe.txt"
+PDB_FILE=$(sed -n "${SGE_TASK_ID}p" "$pdb_list")
+
+# run
+python ~/software/RFdiffusion/scripts/run_inference.py \
+    inference.num_designs=1 \
+    diffuser.partial_T=1 \
+    'contigmap.contigs=[108-108]' \
+    "inference.input_pdb=$PDB_FILE" \
+    "inference.output_prefix=$HOME/multi-state/data/diffusion-output/5KPE-5KPH/$(basename $PDB_FILE .pdb)"
+
+#end
+echo "End: $(date)"
+echo "-----------"
+'''
+-------End of script---------
+
+1
+Unable to determine the device handle for GPU0000:01:00.0: Unknown Error
+Unable to determine the device handle for gpu 0000:01:00.0: Unknown Error
+GPU 1: NVIDIA A40 (UUID: GPU-7955985a-77ce-b3d4-26d2-327a531b6a0c)
+GPU 2: NVIDIA A40 (UUID: GPU-737a613c-9b67-5723-f8a4-a550bce07cf7)
+GPU 3: NVIDIA A40 (UUID: GPU-a4d59d25-aa1e-a4bd-0238-2ad0d1b85ecf)
+/wynton/home/rotation/geanhu/.conda/envs/SE3nv/lib/python3.9/site-packages/torch/cuda/__init__.py:118: UserWarning: CUDA initialization: CUDA unknown error - this may be due to an incorrectly set up environment, e.g. changing env variable CUDA_VISIBLE_DEVICES after program start. Setting the available devices to be zero. (Triggered internally at ../c10/cuda/CUDAFunctions.cpp:108.)
+  return torch._C._cuda_getDeviceCount() > 0
+/wynton/home/rotation/geanhu/.conda/envs/SE3nv/lib/python3.9/site-packages/torch/cuda/__init__.py:619: UserWarning: Can't initialize NVML
+  warnings.warn("Can't initialize NVML")
+False
+0
+crw-rw-rw-. 1 root root 195,   0 Jun  5 23:28 /dev/nvidia0
+crw-rw-rw-. 1 root root 195,   1 Jun  5 23:28 /dev/nvidia1
+crw-rw-rw-. 1 root root 195,   2 Jun  5 23:28 /dev/nvidia2
+crw-rw-rw-. 1 root root 195,   3 Jun  5 23:28 /dev/nvidia3
+crw-rw-rw-. 1 root root 195, 255 Jun  5 23:28 /dev/nvidiactl
+crw-rw-rw-. 1 root root 236,   0 Jun  5 23:28 /dev/nvidia-uvm
+crw-rw-rw-. 1 root root 236,   1 Jun  5 23:28 /dev/nvidia-uvm-tools
+
+/dev/nvidia-caps:
+total 0
+cr--------. 1 root root 239, 1 Jun  5 23:28 nvidia-cap1
+cr--r--r--. 1 root root 239, 2 Jun  5 23:28 nvidia-cap2
+/var/spool/sge/wynton/qb3-atgpu4/job_scripts/4165083: line 55: 
+# create array job settings
+input_dir="$HOME/multi-state/data/string-sampling/end-states/"
+pdb_list="${input_dir}/5kpe.txt"
+PDB_FILE=$(sed -n "${SGE_TASK_ID}p" "$pdb_list")
+
+# run
+python ~/software/RFdiffusion/scripts/run_inference.py \
+    inference.num_designs=1 \
+    diffuser.partial_T=1 \
+    contigmap.contigs=[108-108] \
+    "inference.input_pdb=$PDB_FILE" \
+    "inference.output_prefix=$HOME/multi-state/data/diffusion-output/5KPE-5KPH/$(basename $PDB_FILE .pdb)"
+
+#end
+echo "End: $(date)"
+echo "-----------"
+: No such file or directory

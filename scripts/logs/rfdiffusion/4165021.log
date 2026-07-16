@@ -1,0 +1,608 @@
+Start: Sun Jul 12 23:27:29 PDT 2026
+==============================================================
+job_number:                 4165021
+exec_file:                  job_scripts/4165021
+submission_time:            Sun Jul 12 23:24:19 2026
+owner:                      geanhu
+uid:                        64854
+group:                      wynton-rotation
+gid:                        60001
+sge_o_home:                 /wynton/home/rotation/geanhu
+sge_o_log_name:             geanhu
+sge_o_path:                 /wynton/home/cbi/shared/software/CBI/miniforge3-26.3.2-2/condabin:/wynton/home/cbi/shared/software/CBI/miniforge3-26.3.2-2/bin:/wynton/home/ferrin/goddard/localcolabfold/localcolabfold/colabfold-conda/bin:/wynton/home/rotation/geanhu/.local/bin:/wynton/home/rotation/geanhu/bin:/opt/sge/bin:/opt/sge/bin/lx-amd64:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/wynton/home/kortemme/xingjiepan/Softwares/Rosetta/Rosetta/main/source/bin
+sge_o_shell:                /bin/bash
+sge_o_workdir:              /wynton/home/rotation/geanhu/multi-state/scripts
+sge_o_host:                 dev3
+account:                    sge
+cwd:                        /wynton/home/rotation/geanhu/multi-state/scripts
+merge:                      y
+hard resource_list:         compute_cap=61,gpu_mem=6000M,h_rt=21600,mem_free=32G,scratch=32G,hostname=!(qb3-idgpu18)
+mail_list:                  geanhu@dev3.wynton.ucsf.edu
+notify:                     FALSE
+job_name:                   diffusion
+stdout_path_list:           NONE:NONE:logs/rfdiffusion/$JOB_ID.log
+jobshare:                   0
+hard_queue_list:            gpu.q
+shell_list:                 NONE:/bin/bash
+env_list:                   TERM=NONE
+script_file:                rfdiffusion.sh
+parallel environment:  smp range: 1
+project:                    wynton-rotation
+job-array tasks:            1-159:1
+binding:                    NONE
+job_type:                   NONE
+usage         1:            cpu=00:00:00, mem=0.00000 GB s, io=0.00000 GB, vmem=N/A, maxvmem=N/A
+binding       1:            NONE
+scheduling info:            (Collecting of scheduler job information is turned off)
+------Start of script-------
+#!/bin/bash
+#$ -S /bin/bash
+#$ -q gpu.q
+#$ -pe smp 1
+#$ -l compute_cap=61,gpu_mem=6000M
+#$ -cwd
+#$ -N diffusion
+#$ -o logs/rfdiffusion/$JOB_ID.log
+#$ -j y
+#$ -l h_rt=06:00:00
+#$ -l mem_free=32G
+#$ -l scratch=32G
+#$ -l h=!(qb3-idgpu18)
+#$ -t 1-159
+
+# metadata
+echo "Start: $(date)"
+[[ -n "$JOB_ID" ]] && qstat -j "$JOB_ID"
+echo "------Start of script-------"
+cat "$0"
+echo "-------End of script---------"
+
+# setup env
+module load CBI miniforge3
+conda activate SE3nv
+
+# create array job settings
+input_dir="$HOME/multi-state/data/string-sampling/end-states/"
+pdb_list="${root_dir}/5kpe.txt"
+
+if [! -f "$pdb_list"]; then
+    find "$input_dir" -type f -name "5KPE*.pdb" | sort > "$pdb_list"
+fi
+
+PDB_FILE=$(sed -n "${SGE_TASK_ID}p" "$pdb_list")
+
+# run
+python ~/software/RFdiffusion/scripts/run_inference.py \
+    inference.num_designs=1 \
+    diffuser.partial_T=1 \
+    'contigmap.contigs=[106-106]' \
+    "inference.input_pdb=$PDB_FILE" \
+    "inference.output_prefix=$HOME/multi-state/data/diffusion-output/5KPE-5KPH/$(basename $PDB_FILE .pdb)"
+
+#end
+echo "End: $(date)"-------End of script---------
+/var/spool/sge/wynton/qb3-idgpu7/job_scripts/4165021: line 31: [!: command not found
+sed: can't read /5kpe.txt: No such file or directory
+/wynton/home/rotation/geanhu/software/RFdiffusion/rfdiffusion/util.py:253: UserWarning: Using torch.cross without specifying the dim arg is deprecated.
+Please either pass the dim explicitly or simply use torch.linalg.cross.
+The default value of dim will change to agree with that of linalg.cross in a future release. (Triggered internally at ../aten/src/ATen/native/Cross.cpp:62.)
+  Z = torch.cross(Xn, Yn)
+[2026-07-12 23:27:45,723][__main__][INFO] - Found GPU with device_name NVIDIA TITAN RTX. Will run RFdiffusion on NVIDIA TITAN RTX
+Reading models from /wynton/home/rotation/geanhu/software/RFdiffusion/rfdiffusion/inference/../../models
+[2026-07-12 23:27:45,725][rfdiffusion.inference.model_runners][INFO] - Reading checkpoint from /wynton/home/rotation/geanhu/software/RFdiffusion/rfdiffusion/inference/../../models/Base_ckpt.pt
+This is inf_conf.ckpt_path
+/wynton/home/rotation/geanhu/software/RFdiffusion/rfdiffusion/inference/../../models/Base_ckpt.pt
+Assembling -model, -diffuser and -preprocess configs from checkpoint
+USING MODEL CONFIG: self._conf[model][n_extra_block] = 4
+USING MODEL CONFIG: self._conf[model][n_main_block] = 32
+USING MODEL CONFIG: self._conf[model][n_ref_block] = 4
+USING MODEL CONFIG: self._conf[model][d_msa] = 256
+USING MODEL CONFIG: self._conf[model][d_msa_full] = 64
+USING MODEL CONFIG: self._conf[model][d_pair] = 128
+USING MODEL CONFIG: self._conf[model][d_templ] = 64
+USING MODEL CONFIG: self._conf[model][n_head_msa] = 8
+USING MODEL CONFIG: self._conf[model][n_head_pair] = 4
+USING MODEL CONFIG: self._conf[model][n_head_templ] = 4
+USING MODEL CONFIG: self._conf[model][d_hidden] = 32
+USING MODEL CONFIG: self._conf[model][d_hidden_templ] = 32
+USING MODEL CONFIG: self._conf[model][p_drop] = 0.15
+USING MODEL CONFIG: self._conf[model][SE3_param_full] = {'num_layers': 1, 'num_channels': 32, 'num_degrees': 2, 'n_heads': 4, 'div': 4, 'l0_in_features': 8, 'l0_out_features': 8, 'l1_in_features': 3, 'l1_out_features': 2, 'num_edge_features': 32}
+USING MODEL CONFIG: self._conf[model][SE3_param_topk] = {'num_layers': 1, 'num_channels': 32, 'num_degrees': 2, 'n_heads': 4, 'div': 4, 'l0_in_features': 64, 'l0_out_features': 64, 'l1_in_features': 3, 'l1_out_features': 2, 'num_edge_features': 64}
+USING MODEL CONFIG: self._conf[model][freeze_track_motif] = False
+USING MODEL CONFIG: self._conf[model][use_motif_timestep] = True
+USING MODEL CONFIG: self._conf[diffuser][T] = 50
+USING MODEL CONFIG: self._conf[diffuser][b_0] = 0.01
+USING MODEL CONFIG: self._conf[diffuser][b_T] = 0.07
+USING MODEL CONFIG: self._conf[diffuser][schedule_type] = linear
+USING MODEL CONFIG: self._conf[diffuser][so3_type] = igso3
+USING MODEL CONFIG: self._conf[diffuser][crd_scale] = 0.25
+USING MODEL CONFIG: self._conf[diffuser][so3_schedule_type] = linear
+USING MODEL CONFIG: self._conf[diffuser][min_b] = 1.5
+USING MODEL CONFIG: self._conf[diffuser][max_b] = 2.5
+USING MODEL CONFIG: self._conf[diffuser][min_sigma] = 0.02
+USING MODEL CONFIG: self._conf[diffuser][max_sigma] = 1.5
+USING MODEL CONFIG: self._conf[preprocess][sidechain_input] = False
+USING MODEL CONFIG: self._conf[preprocess][motif_sidechain_input] = True
+USING MODEL CONFIG: self._conf[preprocess][d_t1d] = 22
+USING MODEL CONFIG: self._conf[preprocess][d_t2d] = 44
+USING MODEL CONFIG: self._conf[preprocess][prob_self_cond] = 0.5
+USING MODEL CONFIG: self._conf[preprocess][str_self_cond] = True
+USING MODEL CONFIG: self._conf[preprocess][predict_previous] = False
+WARNING: You are changing diffuser.partial_T from the value this model was trained with. Are you sure you know what you are doing?
+[2026-07-12 23:27:58,639][rfdiffusion.inference.model_runners][INFO] - Loading checkpoint.
+[2026-07-12 23:27:58,830][rfdiffusion.diffusion][INFO] - Calculating IGSO3.
+Successful diffuser __init__
+Error executing job with overrides: ['inference.num_designs=1', 'diffuser.partial_T=1', 'contigmap.contigs=[106-106]', 'inference.input_pdb=', 'inference.output_prefix=/wynton/home/rotation/geanhu/multi-state/data/diffusion-output/5KPE-5KPH/.pdb']
+Traceback (most recent call last):
+  File "/wynton/home/rotation/geanhu/software/RFdiffusion/scripts/run_inference.py", line 54, in main
+    sampler = iu.sampler_selector(conf)
+  File "/wynton/home/rotation/geanhu/software/RFdiffusion/rfdiffusion/inference/utils.py", line 511, in sampler_selector
+    sampler = model_runners.SelfConditioning(conf)
+  File "/wynton/home/rotation/geanhu/software/RFdiffusion/rfdiffusion/inference/model_runners.py", line 38, in __init__
+    self.initialize(conf)
+  File "/wynton/home/rotation/geanhu/software/RFdiffusion/rfdiffusion/inference/model_runners.py", line 172, in initialize
+    self.target_feats = iu.process_target(
+  File "/wynton/home/rotation/geanhu/software/RFdiffusion/rfdiffusion/inference/utils.py", line 615, in process_target
+    target_struct = parse_pdb(pdb_path, parse_hetatom=parse_hetatom)
+  File "/wynton/home/rotation/geanhu/software/RFdiffusion/rfdiffusion/inference/utils.py", line 521, in parse_pdb
+    with open(filename,"r") as f:
+FileNotFoundError: [Errno 2] No such file or directory: ''
+
+Set the environment variable HYDRA_FULL_ERROR=1 for a complete stack trace.
+End: Sun Jul 12 23:28:38 PDT 2026
+Start: Sun Jul 12 23:29:29 PDT 2026
+==============================================================
+job_number:                 4165021
+exec_file:                  job_scripts/4165021
+submission_time:            Sun Jul 12 23:24:19 2026
+owner:                      geanhu
+uid:                        64854
+group:                      wynton-rotation
+gid:                        60001
+sge_o_home:                 /wynton/home/rotation/geanhu
+sge_o_log_name:             geanhu
+sge_o_path:                 /wynton/home/cbi/shared/software/CBI/miniforge3-26.3.2-2/condabin:/wynton/home/cbi/shared/software/CBI/miniforge3-26.3.2-2/bin:/wynton/home/ferrin/goddard/localcolabfold/localcolabfold/colabfold-conda/bin:/wynton/home/rotation/geanhu/.local/bin:/wynton/home/rotation/geanhu/bin:/opt/sge/bin:/opt/sge/bin/lx-amd64:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/wynton/home/kortemme/xingjiepan/Softwares/Rosetta/Rosetta/main/source/bin
+sge_o_shell:                /bin/bash
+sge_o_workdir:              /wynton/home/rotation/geanhu/multi-state/scripts
+sge_o_host:                 dev3
+account:                    sge
+cwd:                        /wynton/home/rotation/geanhu/multi-state/scripts
+merge:                      y
+hard resource_list:         compute_cap=61,gpu_mem=6000M,h_rt=21600,hostname=!(qb3-idgpu18),mem_free=32G,scratch=32G
+mail_list:                  geanhu@dev3.wynton.ucsf.edu
+notify:                     FALSE
+job_name:                   diffusion
+stdout_path_list:           NONE:NONE:logs/rfdiffusion/$JOB_ID.log
+jobshare:                   0
+hard_queue_list:            gpu.q
+shell_list:                 NONE:/bin/bash
+env_list:                   TERM=NONE
+script_file:                rfdiffusion.sh
+parallel environment:  smp range: 1
+project:                    wynton-rotation
+job-array tasks:            1-159:1
+binding:                    NONE
+job_type:                   NONE
+usage         2:            cpu=00:00:00, mem=0.00000 GB s, io=0.00000 GB, vmem=N/A, maxvmem=N/A
+binding       2:            NONE
+scheduling info:            (Collecting of scheduler job information is turned off)
+------Start of script-------
+#!/bin/bash
+#$ -S /bin/bash
+#$ -q gpu.q
+#$ -pe smp 1
+#$ -l compute_cap=61,gpu_mem=6000M
+#$ -cwd
+#$ -N diffusion
+#$ -o logs/rfdiffusion/$JOB_ID.log
+#$ -j y
+#$ -l h_rt=06:00:00
+#$ -l mem_free=32G
+#$ -l scratch=32G
+#$ -l h=!(qb3-idgpu18)
+#$ -t 1-159
+
+# metadata
+echo "Start: $(date)"
+[[ -n "$JOB_ID" ]] && qstat -j "$JOB_ID"
+echo "------Start of script-------"
+cat "$0"
+echo "-------End of script---------"
+
+# setup env
+module load CBI miniforge3
+conda activate SE3nv
+
+# create array job settings
+input_dir="$HOME/multi-state/data/string-sampling/end-states/"
+pdb_list="${root_dir}/5kpe.txt"
+
+if [! -f "$pdb_list"]; then
+    find "$input_dir" -type f -name "5KPE*.pdb" | sort > "$pdb_list"
+fi
+
+PDB_FILE=$(sed -n "${SGE_TASK_ID}p" "$pdb_list")
+
+# run
+python ~/software/RFdiffusion/scripts/run_inference.py \
+    inference.num_designs=1 \
+    diffuser.partial_T=1 \
+    'contigmap.contigs=[106-106]' \
+    "inference.input_pdb=$PDB_FILE" \
+    "inference.output_prefix=$HOME/multi-state/data/diffusion-output/5KPE-5KPH/$(basename $PDB_FILE .pdb)"
+
+#end
+echo "End: $(date)"-------End of script---------
+/var/spool/sge/wynton/qb3-idgpu7/job_scripts/4165021: line 31: [!: command not found
+sed: can't read /5kpe.txt: No such file or directory
+/wynton/home/rotation/geanhu/software/RFdiffusion/rfdiffusion/util.py:253: UserWarning: Using torch.cross without specifying the dim arg is deprecated.
+Please either pass the dim explicitly or simply use torch.linalg.cross.
+The default value of dim will change to agree with that of linalg.cross in a future release. (Triggered internally at ../aten/src/ATen/native/Cross.cpp:62.)
+  Z = torch.cross(Xn, Yn)
+[2026-07-12 23:29:41,008][__main__][INFO] - Found GPU with device_name NVIDIA TITAN RTX. Will run RFdiffusion on NVIDIA TITAN RTX
+Reading models from /wynton/home/rotation/geanhu/software/RFdiffusion/rfdiffusion/inference/../../models
+[2026-07-12 23:29:41,011][rfdiffusion.inference.model_runners][INFO] - Reading checkpoint from /wynton/home/rotation/geanhu/software/RFdiffusion/rfdiffusion/inference/../../models/Base_ckpt.pt
+This is inf_conf.ckpt_path
+/wynton/home/rotation/geanhu/software/RFdiffusion/rfdiffusion/inference/../../models/Base_ckpt.pt
+Assembling -model, -diffuser and -preprocess configs from checkpoint
+USING MODEL CONFIG: self._conf[model][n_extra_block] = 4
+USING MODEL CONFIG: self._conf[model][n_main_block] = 32
+USING MODEL CONFIG: self._conf[model][n_ref_block] = 4
+USING MODEL CONFIG: self._conf[model][d_msa] = 256
+USING MODEL CONFIG: self._conf[model][d_msa_full] = 64
+USING MODEL CONFIG: self._conf[model][d_pair] = 128
+USING MODEL CONFIG: self._conf[model][d_templ] = 64
+USING MODEL CONFIG: self._conf[model][n_head_msa] = 8
+USING MODEL CONFIG: self._conf[model][n_head_pair] = 4
+USING MODEL CONFIG: self._conf[model][n_head_templ] = 4
+USING MODEL CONFIG: self._conf[model][d_hidden] = 32
+USING MODEL CONFIG: self._conf[model][d_hidden_templ] = 32
+USING MODEL CONFIG: self._conf[model][p_drop] = 0.15
+USING MODEL CONFIG: self._conf[model][SE3_param_full] = {'num_layers': 1, 'num_channels': 32, 'num_degrees': 2, 'n_heads': 4, 'div': 4, 'l0_in_features': 8, 'l0_out_features': 8, 'l1_in_features': 3, 'l1_out_features': 2, 'num_edge_features': 32}
+USING MODEL CONFIG: self._conf[model][SE3_param_topk] = {'num_layers': 1, 'num_channels': 32, 'num_degrees': 2, 'n_heads': 4, 'div': 4, 'l0_in_features': 64, 'l0_out_features': 64, 'l1_in_features': 3, 'l1_out_features': 2, 'num_edge_features': 64}
+USING MODEL CONFIG: self._conf[model][freeze_track_motif] = False
+USING MODEL CONFIG: self._conf[model][use_motif_timestep] = True
+USING MODEL CONFIG: self._conf[diffuser][T] = 50
+USING MODEL CONFIG: self._conf[diffuser][b_0] = 0.01
+USING MODEL CONFIG: self._conf[diffuser][b_T] = 0.07
+USING MODEL CONFIG: self._conf[diffuser][schedule_type] = linear
+USING MODEL CONFIG: self._conf[diffuser][so3_type] = igso3
+USING MODEL CONFIG: self._conf[diffuser][crd_scale] = 0.25
+USING MODEL CONFIG: self._conf[diffuser][so3_schedule_type] = linear
+USING MODEL CONFIG: self._conf[diffuser][min_b] = 1.5
+USING MODEL CONFIG: self._conf[diffuser][max_b] = 2.5
+USING MODEL CONFIG: self._conf[diffuser][min_sigma] = 0.02
+USING MODEL CONFIG: self._conf[diffuser][max_sigma] = 1.5
+USING MODEL CONFIG: self._conf[preprocess][sidechain_input] = False
+USING MODEL CONFIG: self._conf[preprocess][motif_sidechain_input] = True
+USING MODEL CONFIG: self._conf[preprocess][d_t1d] = 22
+USING MODEL CONFIG: self._conf[preprocess][d_t2d] = 44
+USING MODEL CONFIG: self._conf[preprocess][prob_self_cond] = 0.5
+USING MODEL CONFIG: self._conf[preprocess][str_self_cond] = True
+USING MODEL CONFIG: self._conf[preprocess][predict_previous] = False
+WARNING: You are changing diffuser.partial_T from the value this model was trained with. Are you sure you know what you are doing?
+[2026-07-12 23:29:50,977][rfdiffusion.inference.model_runners][INFO] - Loading checkpoint.
+[2026-07-12 23:29:51,160][rfdiffusion.diffusion][INFO] - Using cached IGSO3.
+Successful diffuser __init__
+Error executing job with overrides: ['inference.num_designs=1', 'diffuser.partial_T=1', 'contigmap.contigs=[106-106]', 'inference.input_pdb=', 'inference.output_prefix=/wynton/home/rotation/geanhu/multi-state/data/diffusion-output/5KPE-5KPH/.pdb']
+Traceback (most recent call last):
+  File "/wynton/home/rotation/geanhu/software/RFdiffusion/scripts/run_inference.py", line 54, in main
+    sampler = iu.sampler_selector(conf)
+  File "/wynton/home/rotation/geanhu/software/RFdiffusion/rfdiffusion/inference/utils.py", line 511, in sampler_selector
+    sampler = model_runners.SelfConditioning(conf)
+  File "/wynton/home/rotation/geanhu/software/RFdiffusion/rfdiffusion/inference/model_runners.py", line 38, in __init__
+    self.initialize(conf)
+  File "/wynton/home/rotation/geanhu/software/RFdiffusion/rfdiffusion/inference/model_runners.py", line 172, in initialize
+    self.target_feats = iu.process_target(
+  File "/wynton/home/rotation/geanhu/software/RFdiffusion/rfdiffusion/inference/utils.py", line 615, in process_target
+    target_struct = parse_pdb(pdb_path, parse_hetatom=parse_hetatom)
+  File "/wynton/home/rotation/geanhu/software/RFdiffusion/rfdiffusion/inference/utils.py", line 521, in parse_pdb
+    with open(filename,"r") as f:
+FileNotFoundError: [Errno 2] No such file or directory: ''
+
+Set the environment variable HYDRA_FULL_ERROR=1 for a complete stack trace.
+End: Sun Jul 12 23:29:53 PDT 2026
+Start: Sun Jul 12 23:30:29 PDT 2026
+==============================================================
+job_number:                 4165021
+exec_file:                  job_scripts/4165021
+submission_time:            Sun Jul 12 23:24:19 2026
+owner:                      geanhu
+uid:                        64854
+group:                      wynton-rotation
+gid:                        60001
+sge_o_home:                 /wynton/home/rotation/geanhu
+sge_o_log_name:             geanhu
+sge_o_path:                 /wynton/home/cbi/shared/software/CBI/miniforge3-26.3.2-2/condabin:/wynton/home/cbi/shared/software/CBI/miniforge3-26.3.2-2/bin:/wynton/home/ferrin/goddard/localcolabfold/localcolabfold/colabfold-conda/bin:/wynton/home/rotation/geanhu/.local/bin:/wynton/home/rotation/geanhu/bin:/opt/sge/bin:/opt/sge/bin/lx-amd64:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/wynton/home/kortemme/xingjiepan/Softwares/Rosetta/Rosetta/main/source/bin
+sge_o_shell:                /bin/bash
+sge_o_workdir:              /wynton/home/rotation/geanhu/multi-state/scripts
+sge_o_host:                 dev3
+account:                    sge
+cwd:                        /wynton/home/rotation/geanhu/multi-state/scripts
+merge:                      y
+hard resource_list:         compute_cap=61,gpu_mem=6000M,h_rt=21600,hostname=!(qb3-idgpu18),mem_free=32G,scratch=32G
+mail_list:                  geanhu@dev3.wynton.ucsf.edu
+notify:                     FALSE
+job_name:                   diffusion
+stdout_path_list:           NONE:NONE:logs/rfdiffusion/$JOB_ID.log
+jobshare:                   0
+hard_queue_list:            gpu.q
+shell_list:                 NONE:/bin/bash
+env_list:                   TERM=NONE
+script_file:                rfdiffusion.sh
+parallel environment:  smp range: 1
+project:                    wynton-rotation
+job-array tasks:            1-159:1
+binding:                    NONE
+job_type:                   NONE
+usage         3:            cpu=00:00:00, mem=0.00000 GB s, io=0.00000 GB, vmem=N/A, maxvmem=N/A
+binding       3:            NONE
+scheduling info:            (Collecting of scheduler job information is turned off)
+------Start of script-------
+#!/bin/bash
+#$ -S /bin/bash
+#$ -q gpu.q
+#$ -pe smp 1
+#$ -l compute_cap=61,gpu_mem=6000M
+#$ -cwd
+#$ -N diffusion
+#$ -o logs/rfdiffusion/$JOB_ID.log
+#$ -j y
+#$ -l h_rt=06:00:00
+#$ -l mem_free=32G
+#$ -l scratch=32G
+#$ -l h=!(qb3-idgpu18)
+#$ -t 1-159
+
+# metadata
+echo "Start: $(date)"
+[[ -n "$JOB_ID" ]] && qstat -j "$JOB_ID"
+echo "------Start of script-------"
+cat "$0"
+echo "-------End of script---------"
+
+# setup env
+module load CBI miniforge3
+conda activate SE3nv
+
+# create array job settings
+input_dir="$HOME/multi-state/data/string-sampling/end-states/"
+pdb_list="${root_dir}/5kpe.txt"
+
+if [! -f "$pdb_list"]; then
+    find "$input_dir" -type f -name "5KPE*.pdb" | sort > "$pdb_list"
+fi
+
+PDB_FILE=$(sed -n "${SGE_TASK_ID}p" "$pdb_list")
+
+# run
+python ~/software/RFdiffusion/scripts/run_inference.py \
+    inference.num_designs=1 \
+    diffuser.partial_T=1 \
+    'contigmap.contigs=[106-106]' \
+    "inference.input_pdb=$PDB_FILE" \
+    "inference.output_prefix=$HOME/multi-state/data/diffusion-output/5KPE-5KPH/$(basename $PDB_FILE .pdb)"
+
+#end
+echo "End: $(date)"-------End of script---------
+/var/spool/sge/wynton/qb3-idgpu7/job_scripts/4165021: line 31: [!: command not found
+sed: can't read /5kpe.txt: No such file or directory
+/wynton/home/rotation/geanhu/software/RFdiffusion/rfdiffusion/util.py:253: UserWarning: Using torch.cross without specifying the dim arg is deprecated.
+Please either pass the dim explicitly or simply use torch.linalg.cross.
+The default value of dim will change to agree with that of linalg.cross in a future release. (Triggered internally at ../aten/src/ATen/native/Cross.cpp:62.)
+  Z = torch.cross(Xn, Yn)
+[2026-07-12 23:30:40,561][__main__][INFO] - Found GPU with device_name NVIDIA TITAN RTX. Will run RFdiffusion on NVIDIA TITAN RTX
+Reading models from /wynton/home/rotation/geanhu/software/RFdiffusion/rfdiffusion/inference/../../models
+[2026-07-12 23:30:40,564][rfdiffusion.inference.model_runners][INFO] - Reading checkpoint from /wynton/home/rotation/geanhu/software/RFdiffusion/rfdiffusion/inference/../../models/Base_ckpt.pt
+This is inf_conf.ckpt_path
+/wynton/home/rotation/geanhu/software/RFdiffusion/rfdiffusion/inference/../../models/Base_ckpt.pt
+Assembling -model, -diffuser and -preprocess configs from checkpoint
+USING MODEL CONFIG: self._conf[model][n_extra_block] = 4
+USING MODEL CONFIG: self._conf[model][n_main_block] = 32
+USING MODEL CONFIG: self._conf[model][n_ref_block] = 4
+USING MODEL CONFIG: self._conf[model][d_msa] = 256
+USING MODEL CONFIG: self._conf[model][d_msa_full] = 64
+USING MODEL CONFIG: self._conf[model][d_pair] = 128
+USING MODEL CONFIG: self._conf[model][d_templ] = 64
+USING MODEL CONFIG: self._conf[model][n_head_msa] = 8
+USING MODEL CONFIG: self._conf[model][n_head_pair] = 4
+USING MODEL CONFIG: self._conf[model][n_head_templ] = 4
+USING MODEL CONFIG: self._conf[model][d_hidden] = 32
+USING MODEL CONFIG: self._conf[model][d_hidden_templ] = 32
+USING MODEL CONFIG: self._conf[model][p_drop] = 0.15
+USING MODEL CONFIG: self._conf[model][SE3_param_full] = {'num_layers': 1, 'num_channels': 32, 'num_degrees': 2, 'n_heads': 4, 'div': 4, 'l0_in_features': 8, 'l0_out_features': 8, 'l1_in_features': 3, 'l1_out_features': 2, 'num_edge_features': 32}
+USING MODEL CONFIG: self._conf[model][SE3_param_topk] = {'num_layers': 1, 'num_channels': 32, 'num_degrees': 2, 'n_heads': 4, 'div': 4, 'l0_in_features': 64, 'l0_out_features': 64, 'l1_in_features': 3, 'l1_out_features': 2, 'num_edge_features': 64}
+USING MODEL CONFIG: self._conf[model][freeze_track_motif] = False
+USING MODEL CONFIG: self._conf[model][use_motif_timestep] = True
+USING MODEL CONFIG: self._conf[diffuser][T] = 50
+USING MODEL CONFIG: self._conf[diffuser][b_0] = 0.01
+USING MODEL CONFIG: self._conf[diffuser][b_T] = 0.07
+USING MODEL CONFIG: self._conf[diffuser][schedule_type] = linear
+USING MODEL CONFIG: self._conf[diffuser][so3_type] = igso3
+USING MODEL CONFIG: self._conf[diffuser][crd_scale] = 0.25
+USING MODEL CONFIG: self._conf[diffuser][so3_schedule_type] = linear
+USING MODEL CONFIG: self._conf[diffuser][min_b] = 1.5
+USING MODEL CONFIG: self._conf[diffuser][max_b] = 2.5
+USING MODEL CONFIG: self._conf[diffuser][min_sigma] = 0.02
+USING MODEL CONFIG: self._conf[diffuser][max_sigma] = 1.5
+USING MODEL CONFIG: self._conf[preprocess][sidechain_input] = False
+USING MODEL CONFIG: self._conf[preprocess][motif_sidechain_input] = True
+USING MODEL CONFIG: self._conf[preprocess][d_t1d] = 22
+USING MODEL CONFIG: self._conf[preprocess][d_t2d] = 44
+USING MODEL CONFIG: self._conf[preprocess][prob_self_cond] = 0.5
+USING MODEL CONFIG: self._conf[preprocess][str_self_cond] = True
+USING MODEL CONFIG: self._conf[preprocess][predict_previous] = False
+WARNING: You are changing diffuser.partial_T from the value this model was trained with. Are you sure you know what you are doing?
+[2026-07-12 23:30:48,621][rfdiffusion.inference.model_runners][INFO] - Loading checkpoint.
+[2026-07-12 23:30:48,814][rfdiffusion.diffusion][INFO] - Using cached IGSO3.
+Successful diffuser __init__
+Error executing job with overrides: ['inference.num_designs=1', 'diffuser.partial_T=1', 'contigmap.contigs=[106-106]', 'inference.input_pdb=', 'inference.output_prefix=/wynton/home/rotation/geanhu/multi-state/data/diffusion-output/5KPE-5KPH/.pdb']
+Traceback (most recent call last):
+  File "/wynton/home/rotation/geanhu/software/RFdiffusion/scripts/run_inference.py", line 54, in main
+    sampler = iu.sampler_selector(conf)
+  File "/wynton/home/rotation/geanhu/software/RFdiffusion/rfdiffusion/inference/utils.py", line 511, in sampler_selector
+    sampler = model_runners.SelfConditioning(conf)
+  File "/wynton/home/rotation/geanhu/software/RFdiffusion/rfdiffusion/inference/model_runners.py", line 38, in __init__
+    self.initialize(conf)
+  File "/wynton/home/rotation/geanhu/software/RFdiffusion/rfdiffusion/inference/model_runners.py", line 172, in initialize
+    self.target_feats = iu.process_target(
+  File "/wynton/home/rotation/geanhu/software/RFdiffusion/rfdiffusion/inference/utils.py", line 615, in process_target
+    target_struct = parse_pdb(pdb_path, parse_hetatom=parse_hetatom)
+  File "/wynton/home/rotation/geanhu/software/RFdiffusion/rfdiffusion/inference/utils.py", line 521, in parse_pdb
+    with open(filename,"r") as f:
+FileNotFoundError: [Errno 2] No such file or directory: ''
+
+Set the environment variable HYDRA_FULL_ERROR=1 for a complete stack trace.
+End: Sun Jul 12 23:30:50 PDT 2026
+Start: Sun Jul 12 23:31:29 PDT 2026
+==============================================================
+job_number:                 4165021
+exec_file:                  job_scripts/4165021
+submission_time:            Sun Jul 12 23:24:19 2026
+owner:                      geanhu
+uid:                        64854
+group:                      wynton-rotation
+gid:                        60001
+sge_o_home:                 /wynton/home/rotation/geanhu
+sge_o_log_name:             geanhu
+sge_o_path:                 /wynton/home/cbi/shared/software/CBI/miniforge3-26.3.2-2/condabin:/wynton/home/cbi/shared/software/CBI/miniforge3-26.3.2-2/bin:/wynton/home/ferrin/goddard/localcolabfold/localcolabfold/colabfold-conda/bin:/wynton/home/rotation/geanhu/.local/bin:/wynton/home/rotation/geanhu/bin:/opt/sge/bin:/opt/sge/bin/lx-amd64:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/wynton/home/kortemme/xingjiepan/Softwares/Rosetta/Rosetta/main/source/bin
+sge_o_shell:                /bin/bash
+sge_o_workdir:              /wynton/home/rotation/geanhu/multi-state/scripts
+sge_o_host:                 dev3
+account:                    sge
+cwd:                        /wynton/home/rotation/geanhu/multi-state/scripts
+merge:                      y
+hard resource_list:         compute_cap=61,gpu_mem=6000M,h_rt=21600,hostname=!(qb3-idgpu18),mem_free=32G,scratch=32G
+mail_list:                  geanhu@dev3.wynton.ucsf.edu
+notify:                     FALSE
+job_name:                   diffusion
+stdout_path_list:           NONE:NONE:logs/rfdiffusion/$JOB_ID.log
+jobshare:                   0
+hard_queue_list:            gpu.q
+shell_list:                 NONE:/bin/bash
+env_list:                   TERM=NONE
+script_file:                rfdiffusion.sh
+parallel environment:  smp range: 1
+project:                    wynton-rotation
+job-array tasks:            1-159:1
+binding:                    NONE
+job_type:                   NONE
+usage         4:            cpu=00:00:00, mem=0.00000 GB s, io=0.00000 GB, vmem=N/A, maxvmem=N/A
+binding       4:            NONE
+scheduling info:            (Collecting of scheduler job information is turned off)
+------Start of script-------
+#!/bin/bash
+#$ -S /bin/bash
+#$ -q gpu.q
+#$ -pe smp 1
+#$ -l compute_cap=61,gpu_mem=6000M
+#$ -cwd
+#$ -N diffusion
+#$ -o logs/rfdiffusion/$JOB_ID.log
+#$ -j y
+#$ -l h_rt=06:00:00
+#$ -l mem_free=32G
+#$ -l scratch=32G
+#$ -l h=!(qb3-idgpu18)
+#$ -t 1-159
+
+# metadata
+echo "Start: $(date)"
+[[ -n "$JOB_ID" ]] && qstat -j "$JOB_ID"
+echo "------Start of script-------"
+cat "$0"
+echo "-------End of script---------"
+
+# setup env
+module load CBI miniforge3
+conda activate SE3nv
+
+# create array job settings
+input_dir="$HOME/multi-state/data/string-sampling/end-states/"
+pdb_list="${root_dir}/5kpe.txt"
+
+if [! -f "$pdb_list"]; then
+    find "$input_dir" -type f -name "5KPE*.pdb" | sort > "$pdb_list"
+fi
+
+PDB_FILE=$(sed -n "${SGE_TASK_ID}p" "$pdb_list")
+
+# run
+python ~/software/RFdiffusion/scripts/run_inference.py \
+    inference.num_designs=1 \
+    diffuser.partial_T=1 \
+    'contigmap.contigs=[106-106]' \
+    "inference.input_pdb=$PDB_FILE" \
+    "inference.output_prefix=$HOME/multi-state/data/diffusion-output/5KPE-5KPH/$(basename $PDB_FILE .pdb)"
+
+#end
+echo "End: $(date)"-------End of script---------
+/var/spool/sge/wynton/qb3-idgpu7/job_scripts/4165021: line 31: [!: command not found
+sed: can't read /5kpe.txt: No such file or directory
+/wynton/home/rotation/geanhu/software/RFdiffusion/rfdiffusion/util.py:253: UserWarning: Using torch.cross without specifying the dim arg is deprecated.
+Please either pass the dim explicitly or simply use torch.linalg.cross.
+The default value of dim will change to agree with that of linalg.cross in a future release. (Triggered internally at ../aten/src/ATen/native/Cross.cpp:62.)
+  Z = torch.cross(Xn, Yn)
+[2026-07-12 23:31:41,404][__main__][INFO] - Found GPU with device_name NVIDIA TITAN RTX. Will run RFdiffusion on NVIDIA TITAN RTX
+Reading models from /wynton/home/rotation/geanhu/software/RFdiffusion/rfdiffusion/inference/../../models
+[2026-07-12 23:31:41,408][rfdiffusion.inference.model_runners][INFO] - Reading checkpoint from /wynton/home/rotation/geanhu/software/RFdiffusion/rfdiffusion/inference/../../models/Base_ckpt.pt
+This is inf_conf.ckpt_path
+/wynton/home/rotation/geanhu/software/RFdiffusion/rfdiffusion/inference/../../models/Base_ckpt.pt
+Assembling -model, -diffuser and -preprocess configs from checkpoint
+USING MODEL CONFIG: self._conf[model][n_extra_block] = 4
+USING MODEL CONFIG: self._conf[model][n_main_block] = 32
+USING MODEL CONFIG: self._conf[model][n_ref_block] = 4
+USING MODEL CONFIG: self._conf[model][d_msa] = 256
+USING MODEL CONFIG: self._conf[model][d_msa_full] = 64
+USING MODEL CONFIG: self._conf[model][d_pair] = 128
+USING MODEL CONFIG: self._conf[model][d_templ] = 64
+USING MODEL CONFIG: self._conf[model][n_head_msa] = 8
+USING MODEL CONFIG: self._conf[model][n_head_pair] = 4
+USING MODEL CONFIG: self._conf[model][n_head_templ] = 4
+USING MODEL CONFIG: self._conf[model][d_hidden] = 32
+USING MODEL CONFIG: self._conf[model][d_hidden_templ] = 32
+USING MODEL CONFIG: self._conf[model][p_drop] = 0.15
+USING MODEL CONFIG: self._conf[model][SE3_param_full] = {'num_layers': 1, 'num_channels': 32, 'num_degrees': 2, 'n_heads': 4, 'div': 4, 'l0_in_features': 8, 'l0_out_features': 8, 'l1_in_features': 3, 'l1_out_features': 2, 'num_edge_features': 32}
+USING MODEL CONFIG: self._conf[model][SE3_param_topk] = {'num_layers': 1, 'num_channels': 32, 'num_degrees': 2, 'n_heads': 4, 'div': 4, 'l0_in_features': 64, 'l0_out_features': 64, 'l1_in_features': 3, 'l1_out_features': 2, 'num_edge_features': 64}
+USING MODEL CONFIG: self._conf[model][freeze_track_motif] = False
+USING MODEL CONFIG: self._conf[model][use_motif_timestep] = True
+USING MODEL CONFIG: self._conf[diffuser][T] = 50
+USING MODEL CONFIG: self._conf[diffuser][b_0] = 0.01
+USING MODEL CONFIG: self._conf[diffuser][b_T] = 0.07
+USING MODEL CONFIG: self._conf[diffuser][schedule_type] = linear
+USING MODEL CONFIG: self._conf[diffuser][so3_type] = igso3
+USING MODEL CONFIG: self._conf[diffuser][crd_scale] = 0.25
+USING MODEL CONFIG: self._conf[diffuser][so3_schedule_type] = linear
+USING MODEL CONFIG: self._conf[diffuser][min_b] = 1.5
+USING MODEL CONFIG: self._conf[diffuser][max_b] = 2.5
+USING MODEL CONFIG: self._conf[diffuser][min_sigma] = 0.02
+USING MODEL CONFIG: self._conf[diffuser][max_sigma] = 1.5
+USING MODEL CONFIG: self._conf[preprocess][sidechain_input] = False
+USING MODEL CONFIG: self._conf[preprocess][motif_sidechain_input] = True
+USING MODEL CONFIG: self._conf[preprocess][d_t1d] = 22
+USING MODEL CONFIG: self._conf[preprocess][d_t2d] = 44
+USING MODEL CONFIG: self._conf[preprocess][prob_self_cond] = 0.5
+USING MODEL CONFIG: self._conf[preprocess][str_self_cond] = True
+USING MODEL CONFIG: self._conf[preprocess][predict_previous] = False
+WARNING: You are changing diffuser.partial_T from the value this model was trained with. Are you sure you know what you are doing?
+[2026-07-12 23:31:50,707][rfdiffusion.inference.model_runners][INFO] - Loading checkpoint.
+[2026-07-12 23:31:50,892][rfdiffusion.diffusion][INFO] - Using cached IGSO3.
+Successful diffuser __init__
+Error executing job with overrides: ['inference.num_designs=1', 'diffuser.partial_T=1', 'contigmap.contigs=[106-106]', 'inference.input_pdb=', 'inference.output_prefix=/wynton/home/rotation/geanhu/multi-state/data/diffusion-output/5KPE-5KPH/.pdb']
+Traceback (most recent call last):
+  File "/wynton/home/rotation/geanhu/software/RFdiffusion/scripts/run_inference.py", line 54, in main
+    sampler = iu.sampler_selector(conf)
+  File "/wynton/home/rotation/geanhu/software/RFdiffusion/rfdiffusion/inference/utils.py", line 511, in sampler_selector
+    sampler = model_runners.SelfConditioning(conf)
+  File "/wynton/home/rotation/geanhu/software/RFdiffusion/rfdiffusion/inference/model_runners.py", line 38, in __init__
+    self.initialize(conf)
+  File "/wynton/home/rotation/geanhu/software/RFdiffusion/rfdiffusion/inference/model_runners.py", line 172, in initialize
+    self.target_feats = iu.process_target(
+  File "/wynton/home/rotation/geanhu/software/RFdiffusion/rfdiffusion/inference/utils.py", line 615, in process_target
+    target_struct = parse_pdb(pdb_path, parse_hetatom=parse_hetatom)
+  File "/wynton/home/rotation/geanhu/software/RFdiffusion/rfdiffusion/inference/utils.py", line 521, in parse_pdb
+    with open(filename,"r") as f:
+FileNotFoundError: [Errno 2] No such file or directory: ''
+
+Set the environment variable HYDRA_FULL_ERROR=1 for a complete stack trace.
+End: Sun Jul 12 23:31:52 PDT 2026

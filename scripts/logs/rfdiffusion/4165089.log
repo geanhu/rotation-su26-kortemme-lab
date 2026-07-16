@@ -1,0 +1,123 @@
+Start: Mon Jul 13 00:19:29 PDT 2026
+qb3-atgpu24.wynton.ucsf.edu
+==============================================================
+job_number:                 4165089
+exec_file:                  job_scripts/4165089
+submission_time:            Mon Jul 13 00:18:35 2026
+owner:                      geanhu
+uid:                        64854
+group:                      wynton-rotation
+gid:                        60001
+sge_o_home:                 /wynton/home/rotation/geanhu
+sge_o_log_name:             geanhu
+sge_o_path:                 /wynton/home/cbi/shared/software/CBI/miniforge3-26.3.2-2/condabin:/wynton/home/cbi/shared/software/CBI/miniforge3-26.3.2-2/bin:/wynton/home/ferrin/goddard/localcolabfold/localcolabfold/colabfold-conda/bin:/wynton/home/rotation/geanhu/.local/bin:/wynton/home/rotation/geanhu/bin:/opt/sge/bin:/opt/sge/bin/lx-amd64:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/wynton/home/kortemme/xingjiepan/Softwares/Rosetta/Rosetta/main/source/bin
+sge_o_shell:                /bin/bash
+sge_o_workdir:              /wynton/home/rotation/geanhu/multi-state/scripts
+sge_o_host:                 dev3
+account:                    sge
+cwd:                        /wynton/home/rotation/geanhu/multi-state/scripts
+merge:                      y
+hard resource_list:         compute_cap=80,gpu_mem=40G,h_rt=300,mem_free=32G,scratch=32G,hostname=!qb3-idgpu18&!qb3-atgpu4
+mail_list:                  geanhu@dev3.wynton.ucsf.edu
+notify:                     FALSE
+job_name:                   diffusion
+stdout_path_list:           NONE:NONE:logs/rfdiffusion/$JOB_ID.log
+jobshare:                   0
+hard_queue_list:            gpu.q
+shell_list:                 NONE:/bin/bash
+env_list:                   TERM=NONE
+script_file:                rfdiffusion.sh
+parallel environment:  smp range: 1
+project:                    wynton-rotation
+binding:                    NONE
+job_type:                   NONE
+usage         1:            cpu=00:00:00, mem=0.00000 GB s, io=0.00000 GB, vmem=N/A, maxvmem=N/A
+binding       1:            NONE
+scheduling info:            (Collecting of scheduler job information is turned off)
+------Start of script-------
+#!/bin/bash
+#$ -S /bin/bash
+#$ -q gpu.q
+#$ -pe smp 1
+#$ -l compute_cap=80,gpu_mem=40G
+#$ -cwd
+#$ -N diffusion
+#$ -o logs/rfdiffusion/$JOB_ID.log
+#$ -j y
+#$ -l h_rt=00:05:00
+#$ -l mem_free=32G
+#$ -l scratch=32G
+#$ -l h=!qb3-idgpu18&!qb3-atgpu4
+##$ -t 1-159
+
+# metadata
+echo "Start: $(date)"
+echo "$(hostname)"
+[[ -n "$JOB_ID" ]] && qstat -j "$JOB_ID"
+echo "------Start of script-------"
+cat "$0"
+echo ""
+echo "-------End of script---------"
+
+# setup env
+module load CBI miniforge3
+conda activate SE3nv
+
+echo $CUDA_VISIBLE_DEVICES
+nvidia-smi
+python -c "import torch; print(torch.cuda.is_available()); print(torch.cuda.device_count())"
+
+# # create array job settings
+# input_dir="$HOME/multi-state/data/string-sampling/end-states/"
+# pdb_list="${input_dir}/5kpe.txt"
+# PDB_FILE=$(sed -n "${SGE_TASK_ID}p" "$pdb_list")
+
+# # run
+# python ~/software/RFdiffusion/scripts/run_inference.py \
+#     inference.num_designs=1 \
+#     diffuser.partial_T=1 \
+#     'contigmap.contigs=[108-108]' \
+#     "inference.input_pdb=$PDB_FILE" \
+#     "inference.output_prefix=$HOME/multi-state/data/diffusion-output/5KPE-5KPH/$(basename $PDB_FILE .pdb)"
+
+# #end
+# echo "End: $(date)"
+# echo "-----------"
+-------End of script---------
+
+Mon Jul 13 00:19:31 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 550.127.05             Driver Version: 550.127.05     CUDA Version: 12.4     |
+|-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA A40                     Off |   00000000:01:00.0 Off |                    0 |
+|  0%   54C    P0            184W /  300W |     323MiB /  46068MiB |     89%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+|   1  NVIDIA A40                     Off |   00000000:41:00.0 Off |                    0 |
+|  0%   52C    P0            198W /  300W |     297MiB /  46068MiB |     88%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+|   2  NVIDIA A40                     Off |   00000000:81:00.0 Off |                    0 |
+|  0%   26C    P8             28W /  300W |       1MiB /  46068MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+|   3  NVIDIA A40                     Off |   00000000:C1:00.0 Off |                    0 |
+|  0%   57C    P0            227W /  300W |     323MiB /  46068MiB |     89%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+                                                                                         
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI        PID   Type   Process name                              GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    0   N/A  N/A   3571939      C   python                                        314MiB |
+|    1   N/A  N/A   3571937      C   python                                        288MiB |
+|    3   N/A  N/A   3571069      C   python                                        314MiB |
++-----------------------------------------------------------------------------------------+
+True
+4

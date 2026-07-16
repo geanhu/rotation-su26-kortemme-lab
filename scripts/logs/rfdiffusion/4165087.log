@@ -1,0 +1,94 @@
+Start: Mon Jul 13 00:15:30 PDT 2026
+qb3-atgpu4.wynton.ucsf.edu
+==============================================================
+job_number:                 4165087
+exec_file:                  job_scripts/4165087
+submission_time:            Mon Jul 13 00:15:26 2026
+owner:                      geanhu
+uid:                        64854
+group:                      wynton-rotation
+gid:                        60001
+sge_o_home:                 /wynton/home/rotation/geanhu
+sge_o_log_name:             geanhu
+sge_o_path:                 /wynton/home/cbi/shared/software/CBI/miniforge3-26.3.2-2/condabin:/wynton/home/cbi/shared/software/CBI/miniforge3-26.3.2-2/bin:/wynton/home/ferrin/goddard/localcolabfold/localcolabfold/colabfold-conda/bin:/wynton/home/rotation/geanhu/.local/bin:/wynton/home/rotation/geanhu/bin:/opt/sge/bin:/opt/sge/bin/lx-amd64:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/wynton/home/kortemme/xingjiepan/Softwares/Rosetta/Rosetta/main/source/bin
+sge_o_shell:                /bin/bash
+sge_o_workdir:              /wynton/home/rotation/geanhu/multi-state/scripts
+sge_o_host:                 dev3
+account:                    sge
+cwd:                        /wynton/home/rotation/geanhu/multi-state/scripts
+merge:                      y
+hard resource_list:         compute_cap=80,gpu_mem=40G,h_rt=300,mem_free=32G,scratch=32G,hostname=!(qb3-idgpu18)
+mail_list:                  geanhu@dev3.wynton.ucsf.edu
+notify:                     FALSE
+job_name:                   diffusion
+stdout_path_list:           NONE:NONE:logs/rfdiffusion/$JOB_ID.log
+jobshare:                   0
+hard_queue_list:            gpu.q
+shell_list:                 NONE:/bin/bash
+env_list:                   TERM=NONE
+script_file:                rfdiffusion.sh
+parallel environment:  smp range: 1
+project:                    wynton-rotation
+binding:                    NONE
+job_type:                   NONE
+usage         1:            cpu=00:00:00, mem=0.00000 GB s, io=0.00000 GB, vmem=N/A, maxvmem=N/A
+binding       1:            NONE
+scheduling info:            (Collecting of scheduler job information is turned off)
+------Start of script-------
+#!/bin/bash
+#$ -S /bin/bash
+#$ -q gpu.q
+#$ -pe smp 1
+#$ -l compute_cap=80,gpu_mem=40G
+#$ -cwd
+#$ -N diffusion
+#$ -o logs/rfdiffusion/$JOB_ID.log
+#$ -j y
+#$ -l h_rt=00:05:00
+#$ -l mem_free=32G
+#$ -l scratch=32G
+#$ -l h=!(qb3-idgpu18)
+##$ -t 1-159
+
+# metadata
+echo "Start: $(date)"
+echo "$(hostname)"
+[[ -n "$JOB_ID" ]] && qstat -j "$JOB_ID"
+echo "------Start of script-------"
+cat "$0"
+echo ""
+echo "-------End of script---------"
+
+# setup env
+module load CBI miniforge3
+conda activate SE3nv
+
+echo $CUDA_VISIBLE_DEVICES
+nvidia-smi
+python -c "import torch; print(torch.cuda.is_available()); print(torch.cuda.device_count())"
+
+# # create array job settings
+# input_dir="$HOME/multi-state/data/string-sampling/end-states/"
+# pdb_list="${input_dir}/5kpe.txt"
+# PDB_FILE=$(sed -n "${SGE_TASK_ID}p" "$pdb_list")
+
+# # run
+# python ~/software/RFdiffusion/scripts/run_inference.py \
+#     inference.num_designs=1 \
+#     diffuser.partial_T=1 \
+#     'contigmap.contigs=[108-108]' \
+#     "inference.input_pdb=$PDB_FILE" \
+#     "inference.output_prefix=$HOME/multi-state/data/diffusion-output/5KPE-5KPH/$(basename $PDB_FILE .pdb)"
+
+# #end
+# echo "End: $(date)"
+# echo "-----------"
+-------End of script---------
+
+Unable to determine the device handle for GPU0000:01:00.0: Unknown Error
+/wynton/home/rotation/geanhu/.conda/envs/SE3nv/lib/python3.9/site-packages/torch/cuda/__init__.py:118: UserWarning: CUDA initialization: CUDA unknown error - this may be due to an incorrectly set up environment, e.g. changing env variable CUDA_VISIBLE_DEVICES after program start. Setting the available devices to be zero. (Triggered internally at ../c10/cuda/CUDAFunctions.cpp:108.)
+  return torch._C._cuda_getDeviceCount() > 0
+/wynton/home/rotation/geanhu/.conda/envs/SE3nv/lib/python3.9/site-packages/torch/cuda/__init__.py:619: UserWarning: Can't initialize NVML
+  warnings.warn("Can't initialize NVML")
+False
+0
