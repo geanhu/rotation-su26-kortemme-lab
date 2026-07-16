@@ -1,6 +1,7 @@
 import argparse
 from pathlib import Path
 #
+from tqdm import tqdm
 import pandas as pd
 import biotite.sequence as seq
 import biotite.sequence.io.fasta as fasta
@@ -23,7 +24,7 @@ def main():
     }
 
     # iterate through all fasta files
-    for file in Path(args.input).iterdir():
+    for file in tqdm(list(Path(args.input).iterdir())):
         if file.name.endswith('.fa'):
             file = fasta.FastaFile.read(str(file))
 
