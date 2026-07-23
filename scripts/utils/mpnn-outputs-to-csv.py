@@ -15,6 +15,10 @@ def main():
         type=str,
         help="Path to folder with designed sequences (e.g. design0/seqs)"
     )
+    parser.add_argument(
+        "--homooligomer", action="store_true",
+        help = "Parses sequence design outputs assuming homo-oligomer design (i.e. only takes sequence of chain A, assuming every chain has same sequence)"
+    )
     args = parser.parse_args()
 
     # dict to store sequences
@@ -35,6 +39,9 @@ def main():
                 # skip if first seq (input)
                 if not name[1].startswith('id'):
                     continue
+
+                if args.homooligomer:
+                    sequence = sequence.split(':')[0]
                 
                 # store into dict
                 name = name[0] + '_id' + name[1][-1] #name_id0

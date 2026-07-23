@@ -22,6 +22,8 @@ cat "$0"
 echo ""
 echo "-------End of script---------"
 
+export CUDA_VISIBLE_DEVICES=$SGE_GPU
+
 # setup env
 module load CBI miniforge3
 conda activate SE3nv

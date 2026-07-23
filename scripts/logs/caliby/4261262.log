@@ -1,0 +1,90 @@
+Start: Wed Jul 22 14:20:51 PDT 2026
+qb3-id176.wynton.ucsf.edu
+==============================================================
+job_number:                 4261262
+exec_file:                  job_scripts/4261262
+submission_time:            Wed Jul 22 14:18:46 2026
+owner:                      geanhu
+uid:                        64854
+group:                      wynton-rotation
+gid:                        60001
+sge_o_home:                 /wynton/home/rotation/geanhu
+sge_o_log_name:             geanhu
+sge_o_path:                 /wynton/home/rotation/geanhu/software/caliby/envs/caliby/bin:/wynton/home/cbi/shared/software/CBI/miniforge3-24.7.1-0/condabin:/wynton/home/cbi/shared/software/CBI/miniforge3-24.7.1-0/bin:/wynton/home/ferrin/goddard/localcolabfold/localcolabfold/colabfold-conda/bin:/wynton/home/rotation/geanhu/.local/bin:/wynton/home/rotation/geanhu/bin:/opt/sge/bin:/opt/sge/bin/lx-amd64:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/wynton/home/kortemme/xingjiepan/Softwares/Rosetta/Rosetta/main/source/bin
+sge_o_shell:                /bin/bash
+sge_o_workdir:              /wynton/home/rotation/geanhu/multi-state/scripts
+sge_o_host:                 dev3
+account:                    sge
+cwd:                        /wynton/home/rotation/geanhu/multi-state/scripts
+merge:                      y
+hard resource_list:         h_rt=86400,mem_free=32G,scratch=4G
+mail_list:                  geanhu@dev3.wynton.ucsf.edu
+notify:                     FALSE
+job_name:                   caliby
+stdout_path_list:           NONE:NONE:logs/caliby/$JOB_ID.log
+jobshare:                   0
+hard_queue_list:            long.q
+shell_list:                 NONE:/bin/bash
+env_list:                   TERM=NONE
+script_file:                caliby.sh
+project:                    wynton-rotation
+binding:                    NONE
+job_type:                   NONE
+usage         1:            cpu=00:00:00, mem=0.00000 GB s, io=0.00000 GB, vmem=N/A, maxvmem=N/A
+binding       1:            NONE
+scheduling info:            (Collecting of scheduler job information is turned off)
+------Start of script-------
+#!/bin/bash
+#$ -S /bin/bash
+#$ -q long.q
+#$ -cwd
+#$ -N caliby
+#$ -o logs/caliby/$JOB_ID.log
+#$ -j y
+#$ -l h_rt=24:00:00
+#$ -l mem_free=32G
+#$ -l scratch=4G
+
+# metadata
+echo "Start: $(date)"
+echo "$(hostname)"
+[[ -n "$JOB_ID" ]] && qstat -j "$JOB_ID"
+echo "------Start of script-------"
+cat "$0"
+echo ""
+echo "-------End of script---------"
+
+# setup env
+# Load python version
+module load CBI miniforge3/24.7.1-0
+
+# Activate environment
+ENV_DIR=/wynton/home/rotation/geanhu/software/caliby/envs  # set this to your environment directory
+source ${ENV_DIR}/caliby/bin/activate
+
+# Required for AtomWorks.
+# We don't need these environment variables for our use case,
+# but AtomWorks requires them to be set, so we set them to empty strings.
+export PDB_MIRROR_PATH=""
+export CCD_MIRROR_PATH=""
+
+# Directory where model weights are stored. Weights are automatically
+# downloaded from HuggingFace on first use.
+export MODEL_PARAMS_DIR="/wynton/home/rotation/geanhu/software/caliby/model_params"
+
+# run
+python '/wynton/home/rotation/geanhu/software/caliby/caliby/eval/sampling/seq_des_ensemble.py' \
+    ckpt_name_or_path=soluble_caliby \
+    sampling_cfg_overrides.num_seqs_per_pdb=24 \
+    sampling_cfg_overrides.batch_size=1 \
+    seed=0 \
+    max_num_conformers=10 \
+    ++sampling_cfg_overrides.omit_aas=["C", "H"] \
+    ++sampling_cfg_overrides.potts_sampling_cfg.potts_temperature=0.1 \
+    input_cfg.conformer_dir='/wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles' \
+    out_dir='/wynton/home/rotation/geanhu/multi-state/data/caliby-output/5KPE-5KPH/temp10-1'
+-------End of script---------
+no viable alternative at input '[C,'
+See https://hydra.cc/docs/1.2/advanced/override_grammar/basic for details
+
+Set the environment variable HYDRA_FULL_ERROR=1 for a complete stack trace.

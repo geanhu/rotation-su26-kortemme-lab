@@ -1,0 +1,1771 @@
+Start: Wed Jul 22 15:06:23 PDT 2026
+qb3-as15.wynton.ucsf.edu
+==============================================================
+job_number:                 4261435
+exec_file:                  job_scripts/4261435
+submission_time:            Wed Jul 22 14:52:18 2026
+owner:                      geanhu
+uid:                        64854
+group:                      wynton-rotation
+gid:                        60001
+sge_o_home:                 /wynton/home/rotation/geanhu
+sge_o_log_name:             geanhu
+sge_o_path:                 /wynton/home/cbi/shared/software/CBI/miniforge3-24.7.1-0/condabin:/wynton/home/cbi/shared/software/CBI/miniforge3-24.7.1-0/bin:/wynton/home/ferrin/goddard/localcolabfold/localcolabfold/colabfold-conda/bin:/wynton/home/rotation/geanhu/.local/bin:/wynton/home/rotation/geanhu/bin:/opt/sge/bin:/opt/sge/bin/lx-amd64:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/wynton/home/kortemme/xingjiepan/Softwares/Rosetta/Rosetta/main/source/bin
+sge_o_shell:                /bin/bash
+sge_o_workdir:              /wynton/home/rotation/geanhu/multi-state/scripts
+sge_o_host:                 dev3
+account:                    sge
+cwd:                        /wynton/home/rotation/geanhu/multi-state/scripts
+merge:                      y
+hard resource_list:         h_rt=172800,mem_free=32G,scratch=4G
+mail_list:                  geanhu@dev3.wynton.ucsf.edu
+notify:                     FALSE
+job_name:                   caliby
+stdout_path_list:           NONE:NONE:logs/caliby/$JOB_ID.log
+jobshare:                   0
+hard_queue_list:            long.q
+shell_list:                 NONE:/bin/bash
+env_list:                   TERM=NONE
+script_file:                caliby.sh
+project:                    wynton-rotation
+binding:                    NONE
+job_type:                   NONE
+usage         1:            cpu=00:00:00, mem=0.00000 GB s, io=0.00000 GB, vmem=N/A, maxvmem=N/A
+binding       1:            NONE
+scheduling info:            (Collecting of scheduler job information is turned off)
+------Start of script-------
+#!/bin/bash
+#$ -S /bin/bash
+#$ -q long.q
+#$ -cwd
+#$ -N caliby
+#$ -o logs/caliby/$JOB_ID.log
+#$ -j y
+#$ -l h_rt=48:00:00
+#$ -l mem_free=32G
+#$ -l scratch=4G
+
+# metadata
+echo "Start: $(date)"
+echo "$(hostname)"
+[[ -n "$JOB_ID" ]] && qstat -j "$JOB_ID"
+echo "------Start of script-------"
+cat "$0"
+echo ""
+echo "-------End of script---------"
+
+# setup env
+cd '/wynton/home/rotation/geanhu/software/caliby'
+
+# Load python version
+module load CBI miniforge3/24.7.1-0
+
+# Activate environment
+ENV_DIR=/wynton/home/rotation/geanhu/software/caliby/envs  # set this to your environment directory
+source ${ENV_DIR}/caliby/bin/activate
+
+# Required for AtomWorks.
+# We don't need these environment variables for our use case,
+# but AtomWorks requires them to be set, so we set them to empty strings.
+export PDB_MIRROR_PATH=""
+export CCD_MIRROR_PATH=""
+
+# Directory where model weights are stored. Weights are automatically
+# downloaded from HuggingFace on first use.
+export MODEL_PARAMS_DIR="/wynton/home/rotation/geanhu/software/caliby/model_params"
+
+# run
+python '/wynton/home/rotation/geanhu/software/caliby/caliby/eval/sampling/seq_des_ensemble.py' \
+    ckpt_name_or_path=soluble_caliby \
+    sampling_cfg_overrides.num_seqs_per_pdb=24 \
+    sampling_cfg_overrides.batch_size=1 \
+    seed=0 \
+    max_num_conformers=10 \
+    '++sampling_cfg_overrides.omit_aas=["C", "H"]' \
+    ++sampling_cfg_overrides.potts_sampling_cfg.potts_temperature=0.1 \
+    input_cfg.conformer_dir='/wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles' \
+    out_dir='/wynton/home/rotation/geanhu/multi-state/data/caliby-output/5KPE-5KPH/temp10-1'
+-------End of script---------
+Seed set to 0
+/wynton/home/rotation/geanhu/software/caliby/envs/caliby/lib/python3.12/site-packages/torch/jit/_script.py:365: DeprecationWarning: `torch.jit.script_method` is deprecated. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+Using 315 conformer directories
+Using torch.compile to optimize model performance...
+Omitting aatype sampling for: ['C', 'H']
+Sampling 315 PDBs, 24 sequences per PDB...:   0%|          | 0/315 [00:00<?, ?it/s]/wynton/home/cbi/shared/software/CBI/miniforge3-24.7.1-0/lib/python3.12/multiprocessing/popen_fork.py:66: DeprecationWarning: This process (pid=2662208) is multi-threaded, use of fork() may lead to deadlocks in the child.
+  self.pid = os.fork()
+/wynton/home/rotation/geanhu/software/caliby/envs/caliby/lib/python3.12/site-packages/biotite/structure/io/pdb/file.py:475: UserWarning: 432 elements were guessed from atom name
+  warnings.warn(
+/wynton/home/rotation/geanhu/software/caliby/envs/caliby/lib/python3.12/site-packages/biotite/structure/io/pdb/file.py:475: UserWarning: 432 elements were guessed from atom name
+  warnings.warn(
+/wynton/home/rotation/geanhu/software/caliby/envs/caliby/lib/python3.12/site-packages/biotite/structure/io/pdb/file.py:475: UserWarning: 432 elements were guessed from atom name
+  warnings.warn(
+/wynton/home/rotation/geanhu/software/caliby/envs/caliby/lib/python3.12/site-packages/biotite/structure/io/pdb/file.py:475: UserWarning: 432 elements were guessed from atom name
+  warnings.warn(
+/wynton/home/rotation/geanhu/software/caliby/envs/caliby/lib/python3.12/site-packages/biotite/structure/io/pdb/file.py:475: UserWarning: 432 elements were guessed from atom name
+  warnings.warn(
+/wynton/home/rotation/geanhu/software/caliby/envs/caliby/lib/python3.12/site-packages/biotite/structure/io/pdb/file.py:475: UserWarning: 432 elements were guessed from atom name
+  warnings.warn(
+/wynton/home/rotation/geanhu/software/caliby/envs/caliby/lib/python3.12/site-packages/biotite/structure/io/pdb/file.py:475: UserWarning: 432 elements were guessed from atom name
+  warnings.warn(
+/wynton/home/rotation/geanhu/software/caliby/envs/caliby/lib/python3.12/site-packages/biotite/structure/io/pdb/file.py:475: UserWarning: 432 elements were guessed from atom name
+  warnings.warn(
+/wynton/home/rotation/geanhu/software/caliby/envs/caliby/lib/python3.12/site-packages/biotite/structure/io/pdb/file.py:475: UserWarning: 432 elements were guessed from atom name
+  warnings.warn(
+/wynton/home/rotation/geanhu/software/caliby/envs/caliby/lib/python3.12/site-packages/biotite/structure/io/pdb/file.py:475: UserWarning: 432 elements were guessed from atom name
+  warnings.warn(
+/wynton/home/rotation/geanhu/software/caliby/envs/caliby/lib/python3.12/site-packages/biotite/structure/io/pdb/file.py:475: UserWarning: 432 elements were guessed from atom name
+  warnings.warn(
+/wynton/home/rotation/geanhu/software/caliby/envs/caliby/lib/python3.12/site-packages/biotite/structure/io/pdb/file.py:475: UserWarning: 432 elements were guessed from atom name
+  warnings.warn(
+/wynton/home/rotation/geanhu/software/caliby/envs/caliby/lib/python3.12/site-packages/biotite/structure/io/pdb/file.py:475: UserWarning: 432 elements were guessed from atom name
+  warnings.warn(
+/wynton/home/rotation/geanhu/software/caliby/envs/caliby/lib/python3.12/site-packages/biotite/structure/io/pdb/file.py:475: UserWarning: 432 elements were guessed from atom name
+  warnings.warn(
+/wynton/home/rotation/geanhu/software/caliby/envs/caliby/lib/python3.12/site-packages/biotite/structure/io/pdb/file.py:475: UserWarning: 432 elements were guessed from atom name
+  warnings.warn(
+/wynton/home/rotation/geanhu/software/caliby/envs/caliby/lib/python3.12/site-packages/biotite/structure/io/pdb/file.py:475: UserWarning: 432 elements were guessed from atom name
+  warnings.warn(
+/wynton/home/rotation/geanhu/software/caliby/envs/caliby/lib/python3.12/site-packages/biotite/structure/io/pdb/file.py:475: UserWarning: 432 elements were guessed from atom name
+  warnings.warn(
+/wynton/home/rotation/geanhu/software/caliby/envs/caliby/lib/python3.12/site-packages/biotite/structure/io/pdb/file.py:475: UserWarning: 432 elements were guessed from atom name
+  warnings.warn(
+No fixed positions specified, redesigning all positions.
+No amino acid restrictions specified, allowing all amino acids at all positions.
+No symmetry positions specified.
+
+/wynton/home/rotation/geanhu/software/caliby/envs/caliby/lib/python3.12/site-packages/biotite/structure/io/pdb/file.py:475: UserWarning: 432 elements were guessed from atom name
+  warnings.warn(
+Computing potts parameters:   0%|          | 0/9 [00:00<?, ?it/s][A/wynton/home/rotation/geanhu/software/caliby/caliby/data/data.py:99: UserWarning: Using a non-tuple sequence for multidimensional indexing is deprecated and will be changed in pytorch 2.9; use x[tuple(seq)] instead of x[seq]. In pytorch 2.9 this will be interpreted as tensor index, x[torch.tensor(seq)], which will result either in an error or a different result (Triggered internally at /__w/pytorch/pytorch/torch/csrc/autograd/python_variable_indexing.cpp:349.)
+  return data[ranges]
+/wynton/home/rotation/geanhu/software/caliby/envs/caliby/lib/python3.12/site-packages/biotite/structure/io/pdb/file.py:475: UserWarning: 432 elements were guessed from atom name
+  warnings.warn(
+/wynton/home/rotation/geanhu/software/caliby/envs/caliby/lib/python3.12/site-packages/biotite/structure/io/pdb/file.py:475: UserWarning: 432 elements were guessed from atom name
+  warnings.warn(
+/wynton/home/rotation/geanhu/software/caliby/envs/caliby/lib/python3.12/site-packages/biotite/structure/io/pdb/file.py:475: UserWarning: 432 elements were guessed from atom name
+  warnings.warn(
+/wynton/home/rotation/geanhu/software/caliby/envs/caliby/lib/python3.12/site-packages/biotite/structure/io/pdb/file.py:475: UserWarning: 432 elements were guessed from atom name
+  warnings.warn(
+/wynton/home/rotation/geanhu/software/caliby/envs/caliby/lib/python3.12/site-packages/biotite/structure/io/pdb/file.py:475: UserWarning: 432 elements were guessed from atom name
+  warnings.warn(
+/wynton/home/rotation/geanhu/software/caliby/envs/caliby/lib/python3.12/site-packages/biotite/structure/io/pdb/file.py:475: UserWarning: 432 elements were guessed from atom name
+  warnings.warn(
+/wynton/home/rotation/geanhu/software/caliby/envs/caliby/lib/python3.12/site-packages/biotite/structure/io/pdb/file.py:475: UserWarning: 432 elements were guessed from atom name
+  warnings.warn(
+
+/wynton/home/rotation/geanhu/software/caliby/envs/caliby/lib/python3.12/site-packages/biotite/structure/io/pdb/file.py:475: UserWarning: 432 elements were guessed from atom name
+  warnings.warn(
+Computing potts parameters:  11%|█         | 1/9 [00:01<00:14,  1.85s/it][A
+Computing potts parameters:  22%|██▏       | 2/9 [00:03<00:12,  1.84s/it][A
+Computing potts parameters:  33%|███▎      | 3/9 [00:05<00:09,  1.65s/it][A
+Computing potts parameters:  44%|████▍     | 4/9 [00:06<00:07,  1.53s/it][A
+Computing potts parameters:  56%|█████▌    | 5/9 [00:07<00:05,  1.47s/it][A
+Computing potts parameters:  67%|██████▋   | 6/9 [00:09<00:04,  1.43s/it][A
+Computing potts parameters:  78%|███████▊  | 7/9 [00:10<00:02,  1.36s/it][A
+Computing potts parameters:  89%|████████▉ | 8/9 [00:11<00:01,  1.30s/it][A
+Computing potts parameters: 100%|██████████| 9/9 [00:12<00:00,  1.27s/it][A
+                                                                         [A
+Sampling sequences:   0%|          | 0/24 [00:00<?, ?it/s][A
+
+Potts Sampling:   0%|          | 0/500 [00:00<?, ?it/s][A[A
+
+Potts Sampling:   0%|          | 2/500 [00:00<00:24, 19.99it/s][A[A
+
+Potts Sampling:   1%|          | 4/500 [00:00<01:01,  8.10it/s][A[A
+
+Potts Sampling:   1%|          | 6/500 [00:01<01:16,  6.44it/s][A[A
+
+Potts Sampling:   1%|▏         | 7/500 [00:01<01:56,  4.25it/s][A[A
+
+Potts Sampling:   2%|▏         | 8/500 [00:01<01:57,  4.18it/s][A[A
+
+Potts Sampling:   2%|▏         | 9/500 [00:01<01:44,  4.70it/s][A[A
+
+Potts Sampling:   2%|▏         | 10/500 [00:01<01:32,  5.31it/s][A[A
+
+Potts Sampling:   2%|▏         | 11/500 [00:01<01:22,  5.90it/s][A[A
+
+Potts Sampling:   2%|▏         | 12/500 [00:02<01:17,  6.29it/s][A[A
+
+Potts Sampling:   3%|▎         | 13/500 [00:02<01:14,  6.54it/s][A[A
+
+Potts Sampling:   3%|▎         | 14/500 [00:02<01:13,  6.62it/s][A[A
+
+Potts Sampling:   3%|▎         | 15/500 [00:02<01:08,  7.09it/s][A[A
+
+Potts Sampling:   3%|▎         | 16/500 [00:02<01:03,  7.62it/s][A[A
+
+Potts Sampling:   3%|▎         | 17/500 [00:02<01:01,  7.79it/s][A[A
+
+Potts Sampling:   4%|▎         | 18/500 [00:02<00:59,  8.12it/s][A[A
+
+Potts Sampling:   4%|▍         | 19/500 [00:02<00:58,  8.21it/s][A[A
+
+Potts Sampling:   4%|▍         | 20/500 [00:03<00:57,  8.40it/s][A[A
+
+Potts Sampling:   4%|▍         | 21/500 [00:03<00:58,  8.19it/s][A[A
+
+Potts Sampling:   4%|▍         | 22/500 [00:03<01:03,  7.52it/s][A[A
+
+Potts Sampling:   5%|▍         | 23/500 [00:03<01:05,  7.25it/s][A[A
+
+Potts Sampling:   5%|▍         | 24/500 [00:03<01:03,  7.46it/s][A[A
+
+Potts Sampling:   5%|▌         | 25/500 [00:03<01:02,  7.58it/s][A[A
+
+Potts Sampling:   5%|▌         | 26/500 [00:03<00:59,  7.98it/s][A[A
+
+Potts Sampling:   5%|▌         | 27/500 [00:04<00:56,  8.31it/s][A[A
+
+Potts Sampling:   6%|▌         | 28/500 [00:04<00:58,  8.09it/s][A[A
+
+Potts Sampling:   6%|▌         | 29/500 [00:04<00:59,  7.90it/s][A[A
+
+Potts Sampling:   6%|▌         | 30/500 [00:04<01:06,  7.06it/s][A[A
+
+Potts Sampling:   6%|▌         | 31/500 [00:04<01:11,  6.52it/s][A[A
+
+Potts Sampling:   6%|▋         | 32/500 [00:04<01:12,  6.43it/s][A[A
+
+Potts Sampling:   7%|▋         | 33/500 [00:04<01:15,  6.22it/s][A[A
+
+Potts Sampling:   7%|▋         | 34/500 [00:05<01:13,  6.37it/s][A[A
+
+Potts Sampling:   7%|▋         | 35/500 [00:05<01:11,  6.47it/s][A[A
+
+Potts Sampling:   7%|▋         | 36/500 [00:05<01:07,  6.87it/s][A[A
+
+Potts Sampling:   7%|▋         | 37/500 [00:05<01:02,  7.40it/s][A[A
+
+Potts Sampling:   8%|▊         | 38/500 [00:05<00:58,  7.88it/s][A[A
+
+Potts Sampling:   8%|▊         | 39/500 [00:05<00:56,  8.17it/s][A[A
+
+Potts Sampling:   8%|▊         | 40/500 [00:05<00:55,  8.36it/s][A[A
+
+Potts Sampling:   8%|▊         | 41/500 [00:05<00:56,  8.20it/s][A[A
+
+Potts Sampling:   8%|▊         | 42/500 [00:06<00:54,  8.45it/s][A[A
+
+Potts Sampling:   9%|▉         | 44/500 [00:06<00:41, 11.03it/s][A[A
+
+Potts Sampling:   9%|▉         | 46/500 [00:06<00:35, 12.77it/s][A[A
+
+Potts Sampling:  10%|▉         | 48/500 [00:06<00:32, 13.76it/s][A[A
+
+Potts Sampling:  10%|█         | 50/500 [00:06<00:32, 13.92it/s][A[A
+
+Potts Sampling:  10%|█         | 52/500 [00:06<00:31, 14.11it/s][A[A
+
+Potts Sampling:  11%|█         | 54/500 [00:06<00:32, 13.86it/s][A[A
+
+Potts Sampling:  11%|█         | 56/500 [00:07<00:32, 13.63it/s][A[A
+
+Potts Sampling:  12%|█▏        | 58/500 [00:07<00:33, 13.29it/s][A[A
+
+Potts Sampling:  12%|█▏        | 60/500 [00:07<00:34, 12.88it/s][A[A
+
+Potts Sampling:  12%|█▏        | 62/500 [00:07<00:33, 13.19it/s][A[A
+
+Potts Sampling:  13%|█▎        | 64/500 [00:07<00:33, 13.19it/s][A[A
+
+Potts Sampling:  13%|█▎        | 66/500 [00:07<00:34, 12.62it/s][A[A
+
+Potts Sampling:  14%|█▎        | 68/500 [00:07<00:34, 12.69it/s][A[A
+
+Potts Sampling:  14%|█▍        | 70/500 [00:08<00:32, 13.29it/s][A[A
+
+Potts Sampling:  14%|█▍        | 72/500 [00:08<00:30, 13.83it/s][A[A
+
+Potts Sampling:  15%|█▍        | 74/500 [00:08<00:30, 13.92it/s][A[A
+
+Potts Sampling:  15%|█▌        | 76/500 [00:08<00:31, 13.52it/s][A[A
+
+Potts Sampling:  16%|█▌        | 78/500 [00:08<00:30, 13.87it/s][A[A
+
+Potts Sampling:  16%|█▌        | 80/500 [00:08<00:30, 13.92it/s][A[A
+
+Potts Sampling:  16%|█▋        | 82/500 [00:08<00:30, 13.93it/s][A[A
+
+Potts Sampling:  17%|█▋        | 84/500 [00:09<00:30, 13.86it/s][A[A
+
+Potts Sampling:  17%|█▋        | 86/500 [00:09<00:29, 14.21it/s][A[A
+
+Potts Sampling:  18%|█▊        | 88/500 [00:09<00:28, 14.26it/s][A[A
+
+Potts Sampling:  18%|█▊        | 90/500 [00:09<00:27, 14.65it/s][A[A
+
+Potts Sampling:  18%|█▊        | 92/500 [00:09<00:27, 14.72it/s][A[A
+
+Potts Sampling:  19%|█▉        | 94/500 [00:09<00:27, 15.00it/s][A[A
+
+Potts Sampling:  19%|█▉        | 96/500 [00:09<00:26, 15.28it/s][A[A
+
+Potts Sampling:  20%|█▉        | 98/500 [00:09<00:26, 15.42it/s][A[A
+
+Potts Sampling:  20%|██        | 100/500 [00:10<00:25, 15.40it/s][A[A
+
+Potts Sampling:  20%|██        | 102/500 [00:10<00:25, 15.53it/s][A[A
+
+Potts Sampling:  21%|██        | 104/500 [00:10<00:24, 15.99it/s][A[A
+
+Potts Sampling:  21%|██        | 106/500 [00:10<00:23, 16.67it/s][A[A
+
+Potts Sampling:  22%|██▏       | 108/500 [00:10<00:22, 17.46it/s][A[A
+
+Potts Sampling:  22%|██▏       | 110/500 [00:10<00:22, 17.62it/s][A[A
+
+Potts Sampling:  22%|██▏       | 112/500 [00:10<00:21, 18.02it/s][A[A
+
+Potts Sampling:  23%|██▎       | 114/500 [00:10<00:21, 18.24it/s][A[A
+
+Potts Sampling:  23%|██▎       | 116/500 [00:11<00:21, 18.20it/s][A[A
+
+Potts Sampling:  24%|██▎       | 118/500 [00:11<00:21, 17.90it/s][A[A
+
+Potts Sampling:  24%|██▍       | 120/500 [00:11<00:28, 13.45it/s][A[A
+
+Potts Sampling:  24%|██▍       | 122/500 [00:11<00:26, 14.21it/s][A[A
+
+Potts Sampling:  25%|██▌       | 125/500 [00:11<00:21, 17.31it/s][A[A
+
+Potts Sampling:  25%|██▌       | 127/500 [00:11<00:21, 17.63it/s][A[A
+
+Potts Sampling:  26%|██▌       | 130/500 [00:11<00:18, 19.72it/s][A[A
+
+Potts Sampling:  27%|██▋       | 133/500 [00:11<00:17, 20.66it/s][A[A
+
+Potts Sampling:  27%|██▋       | 136/500 [00:12<00:17, 21.15it/s][A[A
+
+Potts Sampling:  28%|██▊       | 139/500 [00:12<00:16, 21.52it/s][A[A
+
+Potts Sampling:  28%|██▊       | 142/500 [00:12<00:16, 22.18it/s][A[A
+
+Potts Sampling:  29%|██▉       | 145/500 [00:12<00:15, 23.17it/s][A[A
+
+Potts Sampling:  30%|██▉       | 148/500 [00:12<00:15, 23.35it/s][A[A
+
+Potts Sampling:  30%|███       | 151/500 [00:12<00:14, 24.08it/s][A[A
+
+Potts Sampling:  31%|███       | 154/500 [00:12<00:14, 23.98it/s][A[A
+
+Potts Sampling:  31%|███▏      | 157/500 [00:12<00:14, 23.76it/s][A[A
+
+Potts Sampling:  32%|███▏      | 160/500 [00:13<00:14, 24.03it/s][A[A
+
+Potts Sampling:  33%|███▎      | 163/500 [00:13<00:14, 23.44it/s][A[A
+
+Potts Sampling:  33%|███▎      | 166/500 [00:13<00:14, 22.90it/s][A[A
+
+Potts Sampling:  34%|███▍      | 169/500 [00:13<00:14, 22.94it/s][A[A
+
+Potts Sampling:  34%|███▍      | 172/500 [00:13<00:14, 21.90it/s][A[A
+
+Potts Sampling:  35%|███▌      | 175/500 [00:13<00:14, 22.77it/s][A[A
+
+Potts Sampling:  36%|███▌      | 178/500 [00:13<00:14, 22.83it/s][A[A
+
+Potts Sampling:  36%|███▌      | 181/500 [00:14<00:15, 21.12it/s][A[A
+
+Potts Sampling:  37%|███▋      | 184/500 [00:14<00:14, 21.50it/s][A[A
+
+Potts Sampling:  37%|███▋      | 187/500 [00:14<00:14, 21.71it/s][A[A
+
+Potts Sampling:  38%|███▊      | 190/500 [00:14<00:13, 22.53it/s][A[A
+
+Potts Sampling:  39%|███▊      | 193/500 [00:14<00:13, 22.59it/s][A[A
+
+Potts Sampling:  39%|███▉      | 196/500 [00:14<00:13, 21.76it/s][A[A
+
+Potts Sampling:  40%|███▉      | 199/500 [00:14<00:14, 20.61it/s][A[A
+
+Potts Sampling:  40%|████      | 202/500 [00:15<00:15, 19.33it/s][A[A
+
+Potts Sampling:  41%|████      | 204/500 [00:15<00:16, 18.39it/s][A[A
+
+Potts Sampling:  41%|████      | 206/500 [00:15<00:16, 17.83it/s][A[A
+
+Potts Sampling:  42%|████▏     | 208/500 [00:15<00:16, 17.48it/s][A[A
+
+Potts Sampling:  42%|████▏     | 210/500 [00:15<00:16, 17.68it/s][A[A
+
+Potts Sampling:  43%|████▎     | 213/500 [00:15<00:14, 19.70it/s][A[A
+
+Potts Sampling:  43%|████▎     | 215/500 [00:15<00:14, 19.37it/s][A[A
+
+Potts Sampling:  43%|████▎     | 217/500 [00:15<00:15, 18.28it/s][A[A
+
+Potts Sampling:  44%|████▍     | 219/500 [00:16<00:15, 17.66it/s][A[A
+
+Potts Sampling:  44%|████▍     | 221/500 [00:16<00:15, 17.52it/s][A[A
+
+Potts Sampling:  45%|████▍     | 223/500 [00:16<00:15, 17.73it/s][A[A
+
+Potts Sampling:  45%|████▌     | 225/500 [00:16<00:15, 17.78it/s][A[A
+
+Potts Sampling:  45%|████▌     | 227/500 [00:16<00:15, 17.59it/s][A[A
+
+Potts Sampling:  46%|████▌     | 229/500 [00:16<00:15, 17.29it/s][A[A
+
+Potts Sampling:  46%|████▌     | 231/500 [00:16<00:15, 17.23it/s][A[A
+
+Potts Sampling:  47%|████▋     | 233/500 [00:16<00:16, 16.26it/s][A[A
+
+Potts Sampling:  47%|████▋     | 235/500 [00:17<00:17, 15.30it/s][A[A
+
+Potts Sampling:  47%|████▋     | 237/500 [00:17<00:17, 15.21it/s][A[A
+
+Potts Sampling:  48%|████▊     | 239/500 [00:17<00:17, 14.77it/s][A[A
+
+Potts Sampling:  48%|████▊     | 241/500 [00:17<00:17, 14.75it/s][A[A
+
+Potts Sampling:  49%|████▊     | 243/500 [00:17<00:17, 15.08it/s][A[A
+
+Potts Sampling:  49%|████▉     | 245/500 [00:17<00:16, 15.62it/s][A[A
+
+Potts Sampling:  49%|████▉     | 247/500 [00:17<00:15, 15.89it/s][A[A
+
+Potts Sampling:  50%|████▉     | 249/500 [00:17<00:16, 15.44it/s][A[A
+
+Potts Sampling:  50%|█████     | 251/500 [00:18<00:16, 14.97it/s][A[A
+
+Potts Sampling:  51%|█████     | 253/500 [00:18<00:17, 14.11it/s][A[A
+
+Potts Sampling:  51%|█████     | 255/500 [00:18<00:17, 13.96it/s][A[A
+
+Potts Sampling:  51%|█████▏    | 257/500 [00:18<00:17, 13.73it/s][A[A
+
+Potts Sampling:  52%|█████▏    | 259/500 [00:18<00:17, 14.09it/s][A[A
+
+Potts Sampling:  52%|█████▏    | 261/500 [00:18<00:17, 14.05it/s][A[A
+
+Potts Sampling:  53%|█████▎    | 263/500 [00:18<00:16, 14.65it/s][A[A
+
+Potts Sampling:  53%|█████▎    | 265/500 [00:19<00:15, 15.35it/s][A[A
+
+Potts Sampling:  53%|█████▎    | 267/500 [00:19<00:15, 15.39it/s][A[A
+
+Potts Sampling:  54%|█████▍    | 269/500 [00:19<00:15, 14.85it/s][A[A
+
+Potts Sampling:  54%|█████▍    | 271/500 [00:19<00:16, 14.09it/s][A[A
+
+Potts Sampling:  55%|█████▍    | 273/500 [00:19<00:15, 14.39it/s][A[A
+
+Potts Sampling:  55%|█████▌    | 275/500 [00:19<00:15, 14.59it/s][A[A
+
+Potts Sampling:  55%|█████▌    | 277/500 [00:19<00:15, 14.49it/s][A[A
+
+Potts Sampling:  56%|█████▌    | 279/500 [00:20<00:15, 14.15it/s][A[A
+
+Potts Sampling:  56%|█████▌    | 281/500 [00:20<00:15, 14.03it/s][A[A
+
+Potts Sampling:  57%|█████▋    | 283/500 [00:20<00:15, 13.85it/s][A[A
+
+Potts Sampling:  57%|█████▋    | 285/500 [00:20<00:15, 13.54it/s][A[A
+
+Potts Sampling:  57%|█████▋    | 287/500 [00:20<00:15, 13.36it/s][A[A
+
+Potts Sampling:  58%|█████▊    | 289/500 [00:20<00:15, 13.96it/s][A[A
+
+Potts Sampling:  58%|█████▊    | 291/500 [00:20<00:13, 15.24it/s][A[A
+
+Potts Sampling:  59%|█████▊    | 293/500 [00:20<00:13, 15.62it/s][A[A
+
+Potts Sampling:  59%|█████▉    | 295/500 [00:21<00:12, 16.06it/s][A[A
+
+Potts Sampling:  59%|█████▉    | 297/500 [00:21<00:12, 15.83it/s][A[A
+
+Potts Sampling:  60%|█████▉    | 299/500 [00:21<00:12, 15.63it/s][A[A
+
+Potts Sampling:  60%|██████    | 301/500 [00:21<00:13, 15.00it/s][A[A
+
+Potts Sampling:  61%|██████    | 303/500 [00:21<00:12, 15.50it/s][A[A
+
+Potts Sampling:  61%|██████    | 305/500 [00:21<00:12, 15.61it/s][A[A
+
+Potts Sampling:  61%|██████▏   | 307/500 [00:21<00:12, 15.35it/s][A[A
+
+Potts Sampling:  62%|██████▏   | 309/500 [00:22<00:12, 15.19it/s][A[A
+
+Potts Sampling:  62%|██████▏   | 311/500 [00:22<00:12, 14.72it/s][A[A
+
+Potts Sampling:  63%|██████▎   | 313/500 [00:22<00:12, 14.72it/s][A[A
+
+Potts Sampling:  63%|██████▎   | 315/500 [00:22<00:12, 14.67it/s][A[A
+
+Potts Sampling:  63%|██████▎   | 317/500 [00:22<00:12, 14.35it/s][A[A
+
+Potts Sampling:  64%|██████▍   | 319/500 [00:22<00:12, 13.94it/s][A[A
+
+Potts Sampling:  64%|██████▍   | 321/500 [00:22<00:12, 14.52it/s][A[A
+
+Potts Sampling:  65%|██████▍   | 323/500 [00:23<00:12, 14.56it/s][A[A
+
+Potts Sampling:  65%|██████▌   | 325/500 [00:23<00:11, 14.87it/s][A[A
+
+Potts Sampling:  65%|██████▌   | 327/500 [00:23<00:11, 15.23it/s][A[A
+
+Potts Sampling:  66%|██████▌   | 329/500 [00:23<00:11, 15.18it/s][A[A
+
+Potts Sampling:  66%|██████▌   | 331/500 [00:23<00:10, 15.62it/s][A[A
+
+Potts Sampling:  67%|██████▋   | 333/500 [00:23<00:10, 16.05it/s][A[A
+
+Potts Sampling:  67%|██████▋   | 335/500 [00:23<00:10, 16.02it/s][A[A
+
+Potts Sampling:  67%|██████▋   | 337/500 [00:23<00:10, 16.09it/s][A[A
+
+Potts Sampling:  68%|██████▊   | 339/500 [00:24<00:09, 16.26it/s][A[A
+
+Potts Sampling:  68%|██████▊   | 341/500 [00:24<00:10, 15.87it/s][A[A
+
+Potts Sampling:  69%|██████▊   | 343/500 [00:24<00:10, 15.04it/s][A[A
+
+Potts Sampling:  69%|██████▉   | 345/500 [00:24<00:10, 15.48it/s][A[A
+
+Potts Sampling:  69%|██████▉   | 347/500 [00:24<00:09, 15.72it/s][A[A
+
+Potts Sampling:  70%|██████▉   | 349/500 [00:24<00:09, 15.10it/s][A[A
+
+Potts Sampling:  70%|███████   | 351/500 [00:24<00:10, 14.43it/s][A[A
+
+Potts Sampling:  71%|███████   | 353/500 [00:24<00:10, 13.79it/s][A[A
+
+Potts Sampling:  71%|███████   | 355/500 [00:25<00:10, 14.08it/s][A[A
+
+Potts Sampling:  71%|███████▏  | 357/500 [00:25<00:10, 13.93it/s][A[A
+
+Potts Sampling:  72%|███████▏  | 359/500 [00:25<00:09, 14.11it/s][A[A
+
+Potts Sampling:  72%|███████▏  | 361/500 [00:25<00:09, 14.43it/s][A[A
+
+Potts Sampling:  73%|███████▎  | 363/500 [00:25<00:09, 14.43it/s][A[A
+
+Potts Sampling:  73%|███████▎  | 365/500 [00:25<00:09, 14.56it/s][A[A
+
+Potts Sampling:  73%|███████▎  | 367/500 [00:25<00:08, 14.95it/s][A[A
+
+Potts Sampling:  74%|███████▍  | 369/500 [00:26<00:08, 16.05it/s][A[A
+
+Potts Sampling:  74%|███████▍  | 371/500 [00:26<00:07, 16.38it/s][A[A
+
+Potts Sampling:  75%|███████▍  | 373/500 [00:26<00:07, 15.88it/s][A[A
+
+Potts Sampling:  75%|███████▌  | 375/500 [00:26<00:08, 15.62it/s][A[A
+
+Potts Sampling:  75%|███████▌  | 377/500 [00:26<00:08, 15.17it/s][A[A
+
+Potts Sampling:  76%|███████▌  | 379/500 [00:26<00:08, 14.82it/s][A[A
+
+Potts Sampling:  76%|███████▌  | 381/500 [00:26<00:08, 14.83it/s][A[A
+
+Potts Sampling:  77%|███████▋  | 383/500 [00:26<00:07, 14.70it/s][A[A
+
+Potts Sampling:  77%|███████▋  | 385/500 [00:27<00:07, 14.61it/s][A[A
+
+Potts Sampling:  77%|███████▋  | 387/500 [00:27<00:07, 14.44it/s][A[A
+
+Potts Sampling:  78%|███████▊  | 389/500 [00:27<00:07, 14.38it/s][A[A
+
+Potts Sampling:  78%|███████▊  | 391/500 [00:27<00:07, 14.77it/s][A[A
+
+Potts Sampling:  79%|███████▊  | 393/500 [00:27<00:07, 15.07it/s][A[A
+
+Potts Sampling:  79%|███████▉  | 395/500 [00:27<00:07, 14.60it/s][A[A
+
+Potts Sampling:  79%|███████▉  | 397/500 [00:27<00:06, 15.03it/s][A[A
+
+Potts Sampling:  80%|███████▉  | 399/500 [00:28<00:06, 15.17it/s][A[A
+
+Potts Sampling:  80%|████████  | 401/500 [00:28<00:06, 14.95it/s][A[A
+
+Potts Sampling:  81%|████████  | 403/500 [00:28<00:06, 14.53it/s][A[A
+
+Potts Sampling:  81%|████████  | 405/500 [00:28<00:06, 14.62it/s][A[A
+
+Potts Sampling:  81%|████████▏ | 407/500 [00:28<00:06, 14.77it/s][A[A
+
+Potts Sampling:  82%|████████▏ | 409/500 [00:28<00:05, 15.52it/s][A[A
+
+Potts Sampling:  82%|████████▏ | 411/500 [00:28<00:05, 15.22it/s][A[A
+
+Potts Sampling:  83%|████████▎ | 413/500 [00:28<00:05, 15.25it/s][A[A
+
+Potts Sampling:  83%|████████▎ | 415/500 [00:29<00:05, 15.07it/s][A[A
+
+Potts Sampling:  83%|████████▎ | 417/500 [00:29<00:05, 14.76it/s][A[A
+
+Potts Sampling:  84%|████████▍ | 419/500 [00:29<00:05, 14.71it/s][A[A
+
+Potts Sampling:  84%|████████▍ | 421/500 [00:29<00:05, 14.36it/s][A[A
+
+Potts Sampling:  85%|████████▍ | 423/500 [00:29<00:05, 14.24it/s][A[A
+
+Potts Sampling:  85%|████████▌ | 425/500 [00:29<00:05, 13.43it/s][A[A
+
+Potts Sampling:  85%|████████▌ | 427/500 [00:29<00:05, 14.05it/s][A[A
+
+Potts Sampling:  86%|████████▌ | 429/500 [00:30<00:04, 14.26it/s][A[A
+
+Potts Sampling:  86%|████████▌ | 431/500 [00:30<00:04, 13.92it/s][A[A
+
+Potts Sampling:  87%|████████▋ | 433/500 [00:30<00:04, 13.47it/s][A[A
+
+Potts Sampling:  87%|████████▋ | 435/500 [00:30<00:04, 13.40it/s][A[A
+
+Potts Sampling:  87%|████████▋ | 437/500 [00:30<00:04, 13.39it/s][A[A
+
+Potts Sampling:  88%|████████▊ | 439/500 [00:30<00:04, 13.92it/s][A[A
+
+Potts Sampling:  88%|████████▊ | 441/500 [00:30<00:04, 14.00it/s][A[A
+
+Potts Sampling:  89%|████████▊ | 443/500 [00:31<00:03, 14.28it/s][A[A
+
+Potts Sampling:  89%|████████▉ | 445/500 [00:31<00:03, 14.40it/s][A[A
+
+Potts Sampling:  89%|████████▉ | 447/500 [00:31<00:03, 14.35it/s][A[A
+
+Potts Sampling:  90%|████████▉ | 449/500 [00:31<00:03, 14.33it/s][A[A
+
+Potts Sampling:  90%|█████████ | 451/500 [00:31<00:03, 14.29it/s][A[A
+
+Potts Sampling:  91%|█████████ | 453/500 [00:31<00:03, 14.34it/s][A[A
+
+Potts Sampling:  91%|█████████ | 455/500 [00:32<00:03, 13.55it/s][A[A
+
+Potts Sampling:  91%|█████████▏| 457/500 [00:32<00:03, 13.02it/s][A[A
+
+Potts Sampling:  92%|█████████▏| 459/500 [00:32<00:03, 12.29it/s][A[A
+
+Potts Sampling:  92%|█████████▏| 461/500 [00:32<00:03, 11.62it/s][A[A
+
+Potts Sampling:  93%|█████████▎| 463/500 [00:32<00:03, 11.51it/s][A[A
+
+Potts Sampling:  93%|█████████▎| 465/500 [00:32<00:02, 12.48it/s][A[A
+
+Potts Sampling:  93%|█████████▎| 467/500 [00:32<00:02, 13.39it/s][A[A
+
+Potts Sampling:  94%|█████████▍| 469/500 [00:33<00:02, 14.10it/s][A[A
+
+Potts Sampling:  94%|█████████▍| 471/500 [00:33<00:01, 14.90it/s][A[A
+
+Potts Sampling:  95%|█████████▍| 473/500 [00:33<00:01, 14.85it/s][A[A
+
+Potts Sampling:  95%|█████████▌| 475/500 [00:33<00:01, 13.50it/s][A[A
+
+Potts Sampling:  95%|█████████▌| 477/500 [00:33<00:01, 12.94it/s][A[A
+
+Potts Sampling:  96%|█████████▌| 479/500 [00:33<00:01, 12.71it/s][A[A
+
+Potts Sampling:  96%|█████████▌| 481/500 [00:34<00:01, 12.25it/s][A[A
+
+Potts Sampling:  97%|█████████▋| 483/500 [00:34<00:01, 12.60it/s][A[A
+
+Potts Sampling:  97%|█████████▋| 485/500 [00:34<00:01, 12.79it/s][A[A
+
+Potts Sampling:  97%|█████████▋| 487/500 [00:34<00:01, 12.48it/s][A[A
+
+Potts Sampling:  98%|█████████▊| 489/500 [00:34<00:00, 12.80it/s][A[A
+
+Potts Sampling:  98%|█████████▊| 491/500 [00:34<00:00, 12.77it/s][A[A
+
+Potts Sampling:  99%|█████████▊| 493/500 [00:34<00:00, 13.05it/s][A[A
+
+Potts Sampling:  99%|█████████▉| 495/500 [00:35<00:00, 13.14it/s][A[A
+
+Potts Sampling:  99%|█████████▉| 497/500 [00:35<00:00, 13.16it/s][A[A
+
+Potts Sampling: 100%|█████████▉| 499/500 [00:35<00:00, 13.69it/s][A[A
+
+                                                                 [A[A
+Sampling sequences:   4%|▍         | 1/24 [00:35<13:45, 35.89s/it][A
+
+Potts Sampling:   0%|          | 0/500 [00:00<?, ?it/s][A[A
+
+Potts Sampling:   1%|          | 4/500 [00:00<00:12, 39.89it/s][A[A
+
+Potts Sampling:   2%|▏         | 8/500 [00:00<00:18, 26.97it/s][A[A
+
+Potts Sampling:   2%|▏         | 11/500 [00:00<00:20, 23.98it/s][A[A
+
+Potts Sampling:   3%|▎         | 14/500 [00:00<00:22, 21.86it/s][A[A
+
+Potts Sampling:   3%|▎         | 17/500 [00:00<00:23, 20.36it/s][A[A
+
+Potts Sampling:   4%|▍         | 20/500 [00:00<00:23, 20.06it/s][A[A
+
+Potts Sampling:   5%|▍         | 23/500 [00:01<00:23, 20.17it/s][A[A
+
+Potts Sampling:   5%|▌         | 26/500 [00:01<00:23, 20.40it/s][A[A
+
+Potts Sampling:   6%|▌         | 29/500 [00:01<00:22, 20.54it/s][A[A
+
+Potts Sampling:   6%|▋         | 32/500 [00:01<00:23, 20.17it/s][A[A
+
+Potts Sampling:   7%|▋         | 35/500 [00:01<00:23, 19.68it/s][A[A
+
+Potts Sampling:   7%|▋         | 37/500 [00:01<00:25, 17.97it/s][A[A
+
+Potts Sampling:   8%|▊         | 39/500 [00:01<00:27, 16.56it/s][A[A
+
+Potts Sampling:   8%|▊         | 41/500 [00:02<00:28, 16.26it/s][A[A
+
+Potts Sampling:   9%|▊         | 43/500 [00:02<00:28, 16.21it/s][A[A
+
+Potts Sampling:   9%|▉         | 45/500 [00:02<00:28, 15.87it/s][A[A
+
+Potts Sampling:   9%|▉         | 47/500 [00:02<00:29, 15.25it/s][A[A
+
+Potts Sampling:  10%|▉         | 49/500 [00:02<00:29, 15.24it/s][A[A
+
+Potts Sampling:  10%|█         | 51/500 [00:02<00:30, 14.68it/s][A[A
+
+Potts Sampling:  11%|█         | 53/500 [00:02<00:30, 14.74it/s][A[A
+
+Potts Sampling:  11%|█         | 55/500 [00:03<00:35, 12.48it/s][A[A
+
+Potts Sampling:  11%|█▏        | 57/500 [00:03<00:33, 13.21it/s][A[A
+
+Potts Sampling:  12%|█▏        | 59/500 [00:03<00:31, 13.81it/s][A[A
+
+Potts Sampling:  12%|█▏        | 61/500 [00:03<00:30, 14.40it/s][A[A
+
+Potts Sampling:  13%|█▎        | 63/500 [00:03<00:29, 14.64it/s][A[A
+
+Potts Sampling:  13%|█▎        | 65/500 [00:03<00:28, 15.02it/s][A[A
+
+Potts Sampling:  13%|█▎        | 67/500 [00:03<00:28, 15.37it/s][A[A
+
+Potts Sampling:  14%|█▍        | 69/500 [00:04<00:27, 15.68it/s][A[A
+
+Potts Sampling:  14%|█▍        | 71/500 [00:04<00:28, 15.15it/s][A[A
+
+Potts Sampling:  15%|█▍        | 73/500 [00:04<00:29, 14.67it/s][A[A
+
+Potts Sampling:  15%|█▌        | 75/500 [00:04<00:29, 14.42it/s][A[A
+
+Potts Sampling:  15%|█▌        | 77/500 [00:04<00:30, 14.05it/s][A[A
+
+Potts Sampling:  16%|█▌        | 79/500 [00:04<00:31, 13.44it/s][A[A
+
+Potts Sampling:  16%|█▌        | 81/500 [00:04<00:30, 13.67it/s][A[A
+
+Potts Sampling:  17%|█▋        | 83/500 [00:05<00:30, 13.72it/s][A[A
+
+Potts Sampling:  17%|█▋        | 85/500 [00:05<00:30, 13.47it/s][A[A
+
+Potts Sampling:  17%|█▋        | 87/500 [00:05<00:30, 13.60it/s][A[A
+
+Potts Sampling:  18%|█▊        | 89/500 [00:05<00:30, 13.68it/s][A[A
+
+Potts Sampling:  18%|█▊        | 91/500 [00:05<00:29, 13.98it/s][A[A
+
+Potts Sampling:  19%|█▊        | 93/500 [00:05<00:27, 14.58it/s][A[A
+
+Potts Sampling:  19%|█▉        | 95/500 [00:05<00:27, 14.98it/s][A[A
+
+Potts Sampling:  19%|█▉        | 97/500 [00:06<00:26, 15.18it/s][A[A
+
+Potts Sampling:  20%|█▉        | 99/500 [00:06<00:25, 15.54it/s][A[A
+
+Potts Sampling:  20%|██        | 101/500 [00:06<00:26, 15.00it/s][A[A
+
+Potts Sampling:  21%|██        | 103/500 [00:06<00:26, 14.85it/s][A[A
+
+Potts Sampling:  21%|██        | 105/500 [00:06<00:27, 14.36it/s][A[A
+
+Potts Sampling:  21%|██▏       | 107/500 [00:06<00:26, 15.02it/s][A[A
+
+Potts Sampling:  22%|██▏       | 109/500 [00:06<00:26, 14.75it/s][A[A
+
+Potts Sampling:  22%|██▏       | 111/500 [00:06<00:26, 14.71it/s][A[A
+
+Potts Sampling:  23%|██▎       | 113/500 [00:07<00:26, 14.74it/s][A[A
+
+Potts Sampling:  23%|██▎       | 115/500 [00:07<00:26, 14.61it/s][A[A
+
+Potts Sampling:  23%|██▎       | 117/500 [00:07<00:25, 14.97it/s][A[A
+
+Potts Sampling:  24%|██▍       | 119/500 [00:07<00:25, 15.16it/s][A[A
+
+Potts Sampling:  24%|██▍       | 121/500 [00:07<00:24, 15.58it/s][A[A
+
+Potts Sampling:  25%|██▍       | 123/500 [00:07<00:24, 15.19it/s][A[A
+
+Potts Sampling:  25%|██▌       | 125/500 [00:07<00:26, 14.42it/s][A[A
+
+Potts Sampling:  25%|██▌       | 127/500 [00:08<00:27, 13.54it/s][A[A
+
+Potts Sampling:  26%|██▌       | 129/500 [00:08<00:27, 13.38it/s][A[A
+
+Potts Sampling:  26%|██▌       | 131/500 [00:08<00:27, 13.42it/s][A[A
+
+Potts Sampling:  27%|██▋       | 133/500 [00:08<00:27, 13.33it/s][A[A
+
+Potts Sampling:  27%|██▋       | 135/500 [00:08<00:26, 13.80it/s][A[A
+
+Potts Sampling:  27%|██▋       | 137/500 [00:08<00:25, 14.12it/s][A[A
+
+Potts Sampling:  28%|██▊       | 139/500 [00:08<00:25, 14.35it/s][A[A
+
+Potts Sampling:  28%|██▊       | 141/500 [00:09<00:25, 14.07it/s][A[A
+
+Potts Sampling:  29%|██▊       | 143/500 [00:09<00:25, 13.94it/s][A[A
+
+Potts Sampling:  29%|██▉       | 145/500 [00:09<00:24, 14.21it/s][A[A
+
+Potts Sampling:  29%|██▉       | 147/500 [00:09<00:24, 14.54it/s][A[A
+
+Potts Sampling:  30%|██▉       | 149/500 [00:09<00:23, 14.76it/s][A[A
+
+Potts Sampling:  30%|███       | 151/500 [00:09<00:24, 14.17it/s][A[A
+
+Potts Sampling:  31%|███       | 153/500 [00:09<00:24, 14.18it/s][A[A
+
+Potts Sampling:  31%|███       | 155/500 [00:10<00:24, 14.26it/s][A[A
+
+Potts Sampling:  31%|███▏      | 157/500 [00:10<00:24, 14.14it/s][A[A
+
+Potts Sampling:  32%|███▏      | 159/500 [00:10<00:24, 14.09it/s][A[A
+
+Potts Sampling:  32%|███▏      | 161/500 [00:10<00:23, 14.67it/s][A[A
+
+Potts Sampling:  33%|███▎      | 163/500 [00:10<00:22, 15.10it/s][A[A
+
+Potts Sampling:  33%|███▎      | 165/500 [00:10<00:21, 15.86it/s][A[A
+
+Potts Sampling:  33%|███▎      | 167/500 [00:10<00:21, 15.53it/s][A[A
+
+Potts Sampling:  34%|███▍      | 169/500 [00:10<00:21, 15.57it/s][A[A
+
+Potts Sampling:  34%|███▍      | 171/500 [00:11<00:20, 15.75it/s][A[A
+
+Potts Sampling:  35%|███▍      | 173/500 [00:11<00:21, 15.21it/s][A[A
+
+Potts Sampling:  35%|███▌      | 175/500 [00:11<00:23, 14.12it/s][A[A
+
+Potts Sampling:  35%|███▌      | 177/500 [00:11<00:23, 13.63it/s][A[A
+
+Potts Sampling:  36%|███▌      | 179/500 [00:11<00:22, 14.03it/s][A[A
+
+Potts Sampling:  36%|███▌      | 181/500 [00:11<00:22, 13.88it/s][A[A
+
+Potts Sampling:  37%|███▋      | 183/500 [00:11<00:22, 13.86it/s][A[A
+
+Potts Sampling:  37%|███▋      | 185/500 [00:12<00:22, 14.00it/s][A[A
+
+Potts Sampling:  37%|███▋      | 187/500 [00:12<00:22, 13.63it/s][A[A
+
+Potts Sampling:  38%|███▊      | 189/500 [00:12<00:23, 13.32it/s][A[A
+
+Potts Sampling:  38%|███▊      | 191/500 [00:12<00:23, 13.34it/s][A[A
+
+Potts Sampling:  39%|███▊      | 193/500 [00:12<00:22, 13.64it/s][A[A
+
+Potts Sampling:  39%|███▉      | 195/500 [00:12<00:21, 14.05it/s][A[A
+
+Potts Sampling:  39%|███▉      | 197/500 [00:12<00:20, 14.80it/s][A[A
+
+Potts Sampling:  40%|███▉      | 199/500 [00:13<00:19, 15.37it/s][A[A
+
+Potts Sampling:  40%|████      | 201/500 [00:13<00:19, 15.71it/s][A[A
+
+Potts Sampling:  41%|████      | 203/500 [00:13<00:18, 15.92it/s][A[A
+
+Potts Sampling:  41%|████      | 205/500 [00:13<00:18, 15.87it/s][A[A
+
+Potts Sampling:  41%|████▏     | 207/500 [00:13<00:18, 15.49it/s][A[A
+
+Potts Sampling:  42%|████▏     | 209/500 [00:13<00:19, 15.05it/s][A[A
+
+Potts Sampling:  42%|████▏     | 211/500 [00:13<00:20, 14.43it/s][A[A
+
+Potts Sampling:  43%|████▎     | 213/500 [00:14<00:20, 14.17it/s][A[A
+
+Potts Sampling:  43%|████▎     | 215/500 [00:14<00:20, 14.16it/s][A[A
+
+Potts Sampling:  43%|████▎     | 217/500 [00:14<00:19, 14.44it/s][A[A
+
+Potts Sampling:  44%|████▍     | 219/500 [00:14<00:18, 15.12it/s][A[A
+
+Potts Sampling:  44%|████▍     | 221/500 [00:14<00:18, 14.79it/s][A[A
+
+Potts Sampling:  45%|████▍     | 223/500 [00:14<00:19, 14.47it/s][A[A
+
+Potts Sampling:  45%|████▌     | 225/500 [00:14<00:19, 14.12it/s][A[A
+
+Potts Sampling:  45%|████▌     | 227/500 [00:15<00:19, 14.22it/s][A[A
+
+Potts Sampling:  46%|████▌     | 229/500 [00:15<00:19, 13.96it/s][A[A
+
+Potts Sampling:  46%|████▌     | 231/500 [00:15<00:20, 13.32it/s][A[A
+
+Potts Sampling:  47%|████▋     | 233/500 [00:15<00:22, 11.77it/s][A[A
+
+Potts Sampling:  47%|████▋     | 235/500 [00:15<00:23, 11.30it/s][A[A
+
+Potts Sampling:  47%|████▋     | 237/500 [00:15<00:23, 11.13it/s][A[A
+
+Potts Sampling:  48%|████▊     | 239/500 [00:16<00:22, 11.38it/s][A[A
+
+Potts Sampling:  48%|████▊     | 241/500 [00:16<00:21, 11.78it/s][A[A
+
+Potts Sampling:  49%|████▊     | 243/500 [00:16<00:20, 12.33it/s][A[A
+
+Potts Sampling:  49%|████▉     | 245/500 [00:16<00:20, 12.36it/s][A[A
+
+Potts Sampling:  49%|████▉     | 247/500 [00:16<00:20, 12.15it/s][A[A
+
+Potts Sampling:  50%|████▉     | 249/500 [00:16<00:21, 11.95it/s][A[A
+
+Potts Sampling:  50%|█████     | 251/500 [00:17<00:20, 11.94it/s][A[A
+
+Potts Sampling:  51%|█████     | 253/500 [00:17<00:20, 12.25it/s][A[A
+
+Potts Sampling:  51%|█████     | 255/500 [00:17<00:20, 12.12it/s][A[A
+
+Potts Sampling:  51%|█████▏    | 257/500 [00:17<00:20, 11.73it/s][A[A
+
+Potts Sampling:  52%|█████▏    | 259/500 [00:17<00:21, 11.11it/s][A[A
+
+Potts Sampling:  52%|█████▏    | 261/500 [00:17<00:22, 10.74it/s][A[A
+
+Potts Sampling:  53%|█████▎    | 263/500 [00:18<00:22, 10.68it/s][A[A
+
+Potts Sampling:  53%|█████▎    | 265/500 [00:18<00:22, 10.60it/s][A[A
+
+Potts Sampling:  53%|█████▎    | 267/500 [00:18<00:22, 10.19it/s][A[A
+
+Potts Sampling:  54%|█████▍    | 269/500 [00:18<00:24,  9.45it/s][A[A
+
+Potts Sampling:  54%|█████▍    | 270/500 [00:19<00:28,  8.13it/s][A[A
+
+Potts Sampling:  54%|█████▍    | 271/500 [00:19<00:32,  7.04it/s][A[A
+
+Potts Sampling:  54%|█████▍    | 272/500 [00:19<00:36,  6.33it/s][A[A
+
+Potts Sampling:  55%|█████▍    | 273/500 [00:19<00:42,  5.33it/s][A[A
+
+Potts Sampling:  55%|█████▍    | 274/500 [00:20<00:45,  4.95it/s][A[A
+
+Potts Sampling:  55%|█████▌    | 275/500 [00:20<00:50,  4.42it/s][A[A
+
+Potts Sampling:  55%|█████▌    | 276/500 [00:20<00:44,  5.03it/s][A[A
+
+Potts Sampling:  55%|█████▌    | 277/500 [00:20<00:38,  5.76it/s][A[A
+
+Potts Sampling:  56%|█████▌    | 278/500 [00:20<00:35,  6.32it/s][A[A
+
+Potts Sampling:  56%|█████▌    | 279/500 [00:20<00:31,  6.96it/s][A[A
+
+Potts Sampling:  56%|█████▌    | 281/500 [00:20<00:22,  9.58it/s][A[A
+
+Potts Sampling:  57%|█████▋    | 283/500 [00:20<00:19, 11.39it/s][A[A
+
+Potts Sampling:  57%|█████▋    | 285/500 [00:21<00:16, 13.18it/s][A[A
+
+Potts Sampling:  57%|█████▋    | 287/500 [00:21<00:14, 14.63it/s][A[A
+
+Potts Sampling:  58%|█████▊    | 289/500 [00:21<00:14, 14.45it/s][A[A
+
+Potts Sampling:  58%|█████▊    | 291/500 [00:21<00:14, 14.49it/s][A[A
+
+Potts Sampling:  59%|█████▊    | 293/500 [00:21<00:14, 14.53it/s][A[A
+
+Potts Sampling:  59%|█████▉    | 295/500 [00:21<00:13, 15.05it/s][A[A
+
+Potts Sampling:  59%|█████▉    | 297/500 [00:21<00:12, 16.27it/s][A[A
+
+Potts Sampling:  60%|█████▉    | 299/500 [00:21<00:12, 16.62it/s][A[A
+
+Potts Sampling:  60%|██████    | 301/500 [00:22<00:11, 16.89it/s][A[A
+
+Potts Sampling:  61%|██████    | 303/500 [00:22<00:11, 17.39it/s][A[A
+
+Potts Sampling:  61%|██████    | 306/500 [00:22<00:09, 19.45it/s][A[A
+
+Potts Sampling:  62%|██████▏   | 308/500 [00:22<00:10, 18.85it/s][A[A
+
+Potts Sampling:  62%|██████▏   | 310/500 [00:22<00:10, 18.48it/s][A[A
+
+Potts Sampling:  62%|██████▏   | 312/500 [00:22<00:10, 17.33it/s][A[A
+
+Potts Sampling:  63%|██████▎   | 314/500 [00:22<00:11, 16.13it/s][A[A
+
+Potts Sampling:  63%|██████▎   | 316/500 [00:22<00:11, 15.63it/s][A[A
+
+Potts Sampling:  64%|██████▎   | 318/500 [00:23<00:11, 15.62it/s][A[A
+
+Potts Sampling:  64%|██████▍   | 320/500 [00:23<00:10, 16.40it/s][A[A
+
+Potts Sampling:  64%|██████▍   | 322/500 [00:23<00:10, 16.75it/s][A[A
+
+Potts Sampling:  65%|██████▍   | 324/500 [00:23<00:10, 16.38it/s][A[A
+
+Potts Sampling:  65%|██████▌   | 326/500 [00:23<00:10, 16.28it/s][A[A
+
+Potts Sampling:  66%|██████▌   | 328/500 [00:23<00:10, 15.94it/s][A[A
+
+Potts Sampling:  66%|██████▌   | 330/500 [00:23<00:10, 16.15it/s][A[A
+
+Potts Sampling:  66%|██████▋   | 332/500 [00:23<00:10, 15.66it/s][A[A
+
+Potts Sampling:  67%|██████▋   | 334/500 [00:24<00:10, 15.48it/s][A[A
+
+Potts Sampling:  67%|██████▋   | 336/500 [00:24<00:10, 14.96it/s][A[A
+
+Potts Sampling:  68%|██████▊   | 338/500 [00:24<00:11, 14.51it/s][A[A
+
+Potts Sampling:  68%|██████▊   | 340/500 [00:24<00:10, 14.57it/s][A[A
+
+Potts Sampling:  68%|██████▊   | 342/500 [00:24<00:10, 14.61it/s][A[A
+
+Potts Sampling:  69%|██████▉   | 344/500 [00:24<00:10, 15.02it/s][A[A
+
+Potts Sampling:  69%|██████▉   | 346/500 [00:24<00:10, 15.03it/s][A[A
+
+Potts Sampling:  70%|██████▉   | 348/500 [00:24<00:09, 15.41it/s][A[A
+
+Potts Sampling:  70%|███████   | 350/500 [00:25<00:09, 15.93it/s][A[A
+
+Potts Sampling:  70%|███████   | 352/500 [00:25<00:09, 15.99it/s][A[A
+
+Potts Sampling:  71%|███████   | 354/500 [00:25<00:08, 16.39it/s][A[A
+
+Potts Sampling:  71%|███████   | 356/500 [00:25<00:08, 16.20it/s][A[A
+
+Potts Sampling:  72%|███████▏  | 358/500 [00:25<00:09, 15.64it/s][A[A
+
+Potts Sampling:  72%|███████▏  | 360/500 [00:25<00:08, 15.97it/s][A[A
+
+Potts Sampling:  72%|███████▏  | 362/500 [00:25<00:09, 15.09it/s][A[A
+
+Potts Sampling:  73%|███████▎  | 364/500 [00:26<00:09, 14.28it/s][A[A
+
+Potts Sampling:  73%|███████▎  | 366/500 [00:26<00:09, 14.03it/s][A[A
+
+Potts Sampling:  74%|███████▎  | 368/500 [00:26<00:09, 14.21it/s][A[A
+
+Potts Sampling:  74%|███████▍  | 370/500 [00:26<00:09, 14.34it/s][A[A
+
+Potts Sampling:  74%|███████▍  | 372/500 [00:26<00:09, 13.90it/s][A[A
+
+Potts Sampling:  75%|███████▍  | 374/500 [00:26<00:09, 13.79it/s][A[A
+
+Potts Sampling:  75%|███████▌  | 376/500 [00:26<00:08, 14.06it/s][A[A
+
+Potts Sampling:  76%|███████▌  | 378/500 [00:27<00:08, 13.95it/s][A[A
+
+Potts Sampling:  76%|███████▌  | 380/500 [00:27<00:08, 13.50it/s][A[A
+
+Potts Sampling:  76%|███████▋  | 382/500 [00:27<00:08, 13.52it/s][A[A
+
+Potts Sampling:  77%|███████▋  | 384/500 [00:27<00:08, 14.10it/s][A[A
+
+Potts Sampling:  77%|███████▋  | 386/500 [00:27<00:07, 14.63it/s][A[A
+
+Potts Sampling:  78%|███████▊  | 388/500 [00:27<00:07, 14.93it/s][A[A
+
+Potts Sampling:  78%|███████▊  | 390/500 [00:27<00:07, 14.63it/s][A[A
+
+Potts Sampling:  78%|███████▊  | 392/500 [00:27<00:07, 15.27it/s][A[A
+
+Potts Sampling:  79%|███████▉  | 394/500 [00:28<00:06, 15.93it/s][A[A
+
+Potts Sampling:  79%|███████▉  | 396/500 [00:28<00:06, 16.55it/s][A[A
+
+Potts Sampling:  80%|███████▉  | 398/500 [00:28<00:06, 16.79it/s][A[A
+
+Potts Sampling:  80%|████████  | 400/500 [00:28<00:05, 16.74it/s][A[A
+
+Potts Sampling:  80%|████████  | 402/500 [00:28<00:05, 16.70it/s][A[A
+
+Potts Sampling:  81%|████████  | 404/500 [00:28<00:05, 17.29it/s][A[A
+
+Potts Sampling:  81%|████████  | 406/500 [00:28<00:05, 16.66it/s][A[A
+
+Potts Sampling:  82%|████████▏ | 408/500 [00:28<00:05, 16.32it/s][A[A
+
+Potts Sampling:  82%|████████▏ | 410/500 [00:29<00:05, 16.55it/s][A[A
+
+Potts Sampling:  82%|████████▏ | 412/500 [00:29<00:05, 17.28it/s][A[A
+
+Potts Sampling:  83%|████████▎ | 414/500 [00:29<00:05, 16.96it/s][A[A
+
+Potts Sampling:  83%|████████▎ | 416/500 [00:29<00:04, 17.36it/s][A[A
+
+Potts Sampling:  84%|████████▎ | 418/500 [00:29<00:04, 17.76it/s][A[A
+
+Potts Sampling:  84%|████████▍ | 420/500 [00:29<00:04, 17.44it/s][A[A
+
+Potts Sampling:  84%|████████▍ | 422/500 [00:29<00:04, 16.93it/s][A[A
+
+Potts Sampling:  85%|████████▍ | 424/500 [00:29<00:04, 17.34it/s][A[A
+
+Potts Sampling:  85%|████████▌ | 427/500 [00:29<00:03, 19.27it/s][A[A
+
+Potts Sampling:  86%|████████▌ | 429/500 [00:30<00:03, 17.99it/s][A[A
+
+Potts Sampling:  86%|████████▌ | 431/500 [00:30<00:04, 17.18it/s][A[A
+
+Potts Sampling:  87%|████████▋ | 433/500 [00:30<00:03, 16.75it/s][A[A
+
+Potts Sampling:  87%|████████▋ | 435/500 [00:30<00:03, 16.99it/s][A[A
+
+Potts Sampling:  87%|████████▋ | 437/500 [00:30<00:03, 16.95it/s][A[A
+
+Potts Sampling:  88%|████████▊ | 439/500 [00:30<00:03, 17.35it/s][A[A
+
+Potts Sampling:  88%|████████▊ | 441/500 [00:30<00:03, 17.52it/s][A[A
+
+Potts Sampling:  89%|████████▊ | 443/500 [00:30<00:03, 17.35it/s][A[A
+
+Potts Sampling:  89%|████████▉ | 445/500 [00:31<00:03, 16.82it/s][A[A
+
+Potts Sampling:  89%|████████▉ | 447/500 [00:31<00:03, 17.23it/s][A[A
+
+Potts Sampling:  90%|████████▉ | 449/500 [00:31<00:03, 16.36it/s][A[A
+
+Potts Sampling:  90%|█████████ | 451/500 [00:31<00:02, 16.37it/s][A[A
+
+Potts Sampling:  91%|█████████ | 453/500 [00:31<00:02, 16.08it/s][A[A
+
+Potts Sampling:  91%|█████████ | 455/500 [00:31<00:02, 15.59it/s][A[A
+
+Potts Sampling:  91%|█████████▏| 457/500 [00:31<00:02, 15.31it/s][A[A
+
+Potts Sampling:  92%|█████████▏| 459/500 [00:31<00:02, 14.43it/s][A[A
+
+Potts Sampling:  92%|█████████▏| 461/500 [00:32<00:02, 14.65it/s][A[A
+
+Potts Sampling:  93%|█████████▎| 463/500 [00:32<00:02, 14.69it/s][A[A
+
+Potts Sampling:  93%|█████████▎| 465/500 [00:32<00:02, 14.12it/s][A[A
+
+Potts Sampling:  93%|█████████▎| 467/500 [00:32<00:02, 14.11it/s][A[A
+
+Potts Sampling:  94%|█████████▍| 469/500 [00:32<00:02, 15.16it/s][A[A
+
+Potts Sampling:  94%|█████████▍| 471/500 [00:32<00:01, 15.63it/s][A[A
+
+Potts Sampling:  95%|█████████▍| 473/500 [00:32<00:01, 15.49it/s][A[A
+
+Potts Sampling:  95%|█████████▌| 475/500 [00:33<00:01, 15.94it/s][A[A
+
+Potts Sampling:  95%|█████████▌| 477/500 [00:33<00:01, 16.51it/s][A[A
+
+Potts Sampling:  96%|█████████▌| 479/500 [00:33<00:01, 16.80it/s][A[A
+
+Potts Sampling:  96%|█████████▌| 481/500 [00:33<00:01, 16.61it/s][A[A
+
+Potts Sampling:  97%|█████████▋| 483/500 [00:33<00:01, 16.63it/s][A[A
+
+Potts Sampling:  97%|█████████▋| 485/500 [00:33<00:00, 16.65it/s][A[A
+
+Potts Sampling:  97%|█████████▋| 487/500 [00:33<00:00, 16.60it/s][A[A
+
+Potts Sampling:  98%|█████████▊| 489/500 [00:33<00:00, 16.83it/s][A[A
+
+Potts Sampling:  98%|█████████▊| 491/500 [00:33<00:00, 16.30it/s][A[A
+
+Potts Sampling:  99%|█████████▊| 493/500 [00:34<00:00, 16.00it/s][A[A
+
+Potts Sampling:  99%|█████████▉| 495/500 [00:34<00:00, 15.65it/s][A[A
+
+Potts Sampling:  99%|█████████▉| 497/500 [00:34<00:00, 15.21it/s][A[A
+
+Potts Sampling: 100%|█████████▉| 499/500 [00:34<00:00, 15.53it/s][A[A
+
+                                                                 [A[A
+Sampling sequences:   8%|▊         | 2/24 [01:10<12:56, 35.29s/it][A
+
+Potts Sampling:   0%|          | 0/500 [00:00<?, ?it/s][A[A
+
+Potts Sampling:   1%|          | 4/500 [00:00<00:14, 34.75it/s][A[A
+
+Potts Sampling:   2%|▏         | 8/500 [00:00<00:19, 25.41it/s][A[A
+
+Potts Sampling:   2%|▏         | 11/500 [00:00<00:21, 22.82it/s][A[A
+
+Potts Sampling:   3%|▎         | 14/500 [00:00<00:22, 22.02it/s][A[A
+
+Potts Sampling:   3%|▎         | 17/500 [00:00<00:21, 22.47it/s][A[A
+
+Potts Sampling:   4%|▍         | 20/500 [00:00<00:22, 21.42it/s][A[A
+
+Potts Sampling:   5%|▍         | 23/500 [00:01<00:23, 20.56it/s][A[A
+
+Potts Sampling:   5%|▌         | 26/500 [00:01<00:23, 20.14it/s][A[A
+
+Potts Sampling:   6%|▌         | 29/500 [00:01<00:24, 19.06it/s][A[A
+
+Potts Sampling:   6%|▌         | 31/500 [00:01<00:26, 17.66it/s][A[A
+
+Potts Sampling:   7%|▋         | 33/500 [00:01<00:27, 16.80it/s][A[A
+
+Potts Sampling:   7%|▋         | 35/500 [00:01<00:28, 16.39it/s][A[A
+
+Potts Sampling:   7%|▋         | 37/500 [00:01<00:28, 16.04it/s][A[A
+
+Potts Sampling:   8%|▊         | 39/500 [00:02<00:29, 15.86it/s][A[A
+
+Potts Sampling:   8%|▊         | 41/500 [00:02<00:29, 15.47it/s][A[A
+
+Potts Sampling:   9%|▊         | 43/500 [00:02<00:30, 14.92it/s][A[A
+
+Potts Sampling:   9%|▉         | 45/500 [00:02<00:31, 14.47it/s][A[A
+
+Potts Sampling:   9%|▉         | 47/500 [00:02<00:32, 14.15it/s][A[A
+
+Potts Sampling:  10%|▉         | 49/500 [00:02<00:32, 13.84it/s][A[A
+
+Potts Sampling:  10%|█         | 51/500 [00:02<00:33, 13.43it/s][A[A
+
+Potts Sampling:  11%|█         | 53/500 [00:03<00:33, 13.30it/s][A[A
+
+Potts Sampling:  11%|█         | 55/500 [00:03<00:35, 12.69it/s][A[A
+
+Potts Sampling:  11%|█▏        | 57/500 [00:03<00:34, 12.97it/s][A[A
+
+Potts Sampling:  12%|█▏        | 59/500 [00:03<00:33, 13.19it/s][A[A
+
+Potts Sampling:  12%|█▏        | 61/500 [00:03<00:33, 12.96it/s][A[A
+
+Potts Sampling:  13%|█▎        | 63/500 [00:03<00:32, 13.51it/s][A[A
+
+Potts Sampling:  13%|█▎        | 65/500 [00:04<00:30, 14.39it/s][A[A
+
+Potts Sampling:  13%|█▎        | 67/500 [00:04<00:30, 14.20it/s][A[A
+
+Potts Sampling:  14%|█▍        | 69/500 [00:04<00:31, 13.47it/s][A[A
+
+Potts Sampling:  14%|█▍        | 71/500 [00:04<00:31, 13.46it/s][A[A
+
+Potts Sampling:  15%|█▍        | 73/500 [00:04<00:32, 13.23it/s][A[A
+
+Potts Sampling:  15%|█▌        | 75/500 [00:04<00:32, 12.93it/s][A[A
+
+Potts Sampling:  15%|█▌        | 77/500 [00:04<00:32, 12.92it/s][A[A
+
+Potts Sampling:  16%|█▌        | 79/500 [00:05<00:32, 13.10it/s][A[A
+
+Potts Sampling:  16%|█▌        | 81/500 [00:05<00:32, 12.89it/s][A[A
+
+Potts Sampling:  17%|█▋        | 83/500 [00:05<00:32, 12.64it/s][A[A
+
+Potts Sampling:  17%|█▋        | 85/500 [00:05<00:35, 11.80it/s][A[A
+
+Potts Sampling:  17%|█▋        | 87/500 [00:05<00:35, 11.57it/s][A[A
+
+Potts Sampling:  18%|█▊        | 89/500 [00:05<00:34, 11.96it/s][A[A
+
+Potts Sampling:  18%|█▊        | 91/500 [00:06<00:33, 12.32it/s][A[A
+
+Potts Sampling:  19%|█▊        | 93/500 [00:06<00:33, 12.09it/s][A[A
+
+Potts Sampling:  19%|█▉        | 95/500 [00:06<00:32, 12.27it/s][A[A
+
+Potts Sampling:  19%|█▉        | 97/500 [00:06<00:31, 12.74it/s][A[A
+
+Potts Sampling:  20%|█▉        | 99/500 [00:06<00:31, 12.85it/s][A[A
+
+Potts Sampling:  20%|██        | 101/500 [00:06<00:30, 13.14it/s][A[A
+
+Potts Sampling:  21%|██        | 103/500 [00:07<00:30, 12.95it/s][A[A
+
+Potts Sampling:  21%|██        | 105/500 [00:07<00:30, 12.96it/s][A[A
+
+Potts Sampling:  21%|██▏       | 107/500 [00:07<00:29, 13.16it/s][A[A
+
+Potts Sampling:  22%|██▏       | 109/500 [00:07<00:28, 13.64it/s][A[A
+
+Potts Sampling:  22%|██▏       | 111/500 [00:07<00:27, 13.91it/s][A[A
+
+Potts Sampling:  23%|██▎       | 113/500 [00:07<00:27, 13.83it/s][A[A
+
+Potts Sampling:  23%|██▎       | 115/500 [00:07<00:26, 14.44it/s][A[A
+
+Potts Sampling:  23%|██▎       | 117/500 [00:07<00:26, 14.54it/s][A[A
+
+Potts Sampling:  24%|██▍       | 119/500 [00:08<00:25, 14.75it/s][A[A
+
+Potts Sampling:  24%|██▍       | 121/500 [00:08<00:25, 15.06it/s][A[A
+
+Potts Sampling:  25%|██▍       | 123/500 [00:08<00:24, 15.24it/s][A[A
+
+Potts Sampling:  25%|██▌       | 125/500 [00:08<00:24, 15.59it/s][A[A
+
+Potts Sampling:  25%|██▌       | 127/500 [00:08<00:23, 15.93it/s][A[A
+
+Potts Sampling:  26%|██▌       | 129/500 [00:08<00:23, 15.62it/s][A[A
+
+Potts Sampling:  26%|██▌       | 131/500 [00:08<00:23, 15.51it/s][A[A
+
+Potts Sampling:  27%|██▋       | 133/500 [00:09<00:23, 15.93it/s][A[A
+
+Potts Sampling:  27%|██▋       | 135/500 [00:09<00:23, 15.22it/s][A[A
+
+Potts Sampling:  27%|██▋       | 137/500 [00:09<00:23, 15.61it/s][A[A
+
+Potts Sampling:  28%|██▊       | 139/500 [00:09<00:22, 15.75it/s][A[A
+
+Potts Sampling:  28%|██▊       | 141/500 [00:09<00:21, 16.39it/s][A[A
+
+Potts Sampling:  29%|██▊       | 143/500 [00:09<00:22, 15.82it/s][A[A
+
+Potts Sampling:  29%|██▉       | 145/500 [00:09<00:23, 15.30it/s][A[A
+
+Potts Sampling:  29%|██▉       | 147/500 [00:09<00:24, 14.45it/s][A[A
+
+Potts Sampling:  30%|██▉       | 149/500 [00:10<00:24, 14.18it/s][A[A
+
+Potts Sampling:  30%|███       | 151/500 [00:10<00:23, 14.70it/s][A[A
+
+Potts Sampling:  31%|███       | 153/500 [00:10<00:25, 13.83it/s][A[A
+
+Potts Sampling:  31%|███       | 155/500 [00:10<00:26, 13.08it/s][A[A
+
+Potts Sampling:  31%|███▏      | 157/500 [00:10<00:27, 12.41it/s][A[A
+
+Potts Sampling:  32%|███▏      | 159/500 [00:10<00:27, 12.50it/s][A[A
+
+Potts Sampling:  32%|███▏      | 161/500 [00:11<00:27, 12.55it/s][A[A
+
+Potts Sampling:  33%|███▎      | 163/500 [00:11<00:27, 12.30it/s][A[A
+
+Potts Sampling:  33%|███▎      | 165/500 [00:11<00:29, 11.55it/s][A[A
+
+Potts Sampling:  33%|███▎      | 167/500 [00:11<00:29, 11.18it/s][A[A
+
+Potts Sampling:  34%|███▍      | 169/500 [00:11<00:30, 10.99it/s][A[A
+
+Potts Sampling:  34%|███▍      | 171/500 [00:11<00:30, 10.94it/s][A[A
+
+Potts Sampling:  35%|███▍      | 173/500 [00:12<00:30, 10.82it/s][A[A
+
+Potts Sampling:  35%|███▌      | 175/500 [00:12<00:29, 10.95it/s][A[A
+
+Potts Sampling:  35%|███▌      | 177/500 [00:12<00:28, 11.30it/s][A[A
+
+Potts Sampling:  36%|███▌      | 179/500 [00:12<00:27, 11.59it/s][A[A
+
+Potts Sampling:  36%|███▌      | 181/500 [00:12<00:26, 12.12it/s][A[A
+
+Potts Sampling:  37%|███▋      | 183/500 [00:12<00:25, 12.31it/s][A[A
+
+Potts Sampling:  37%|███▋      | 185/500 [00:13<00:25, 12.19it/s][A[A
+
+Potts Sampling:  37%|███▋      | 187/500 [00:13<00:26, 12.03it/s][A[A
+
+Potts Sampling:  38%|███▊      | 189/500 [00:13<00:25, 12.00it/s][A[A
+
+Potts Sampling:  38%|███▊      | 191/500 [00:13<00:25, 12.23it/s][A[A
+
+Potts Sampling:  39%|███▊      | 193/500 [00:13<00:24, 12.47it/s][A[A
+
+Potts Sampling:  39%|███▉      | 195/500 [00:13<00:24, 12.29it/s][A[A
+
+Potts Sampling:  39%|███▉      | 197/500 [00:14<00:25, 11.92it/s][A[A
+
+Potts Sampling:  40%|███▉      | 199/500 [00:14<00:25, 11.80it/s][A[A
+
+Potts Sampling:  40%|████      | 201/500 [00:14<00:25, 11.74it/s][A[A
+
+Potts Sampling:  41%|████      | 203/500 [00:14<00:25, 11.52it/s][A[A
+
+Potts Sampling:  41%|████      | 205/500 [00:14<00:25, 11.57it/s][A[A
+
+Potts Sampling:  41%|████▏     | 207/500 [00:14<00:25, 11.64it/s][A[A
+
+Potts Sampling:  42%|████▏     | 209/500 [00:15<00:23, 12.44it/s][A[A
+
+Potts Sampling:  42%|████▏     | 211/500 [00:15<00:21, 13.25it/s][A[A
+
+Potts Sampling:  43%|████▎     | 213/500 [00:15<00:20, 13.95it/s][A[A
+
+Potts Sampling:  43%|████▎     | 215/500 [00:15<00:20, 14.12it/s][A[A
+
+Potts Sampling:  43%|████▎     | 217/500 [00:15<00:19, 14.26it/s][A[A
+
+Potts Sampling:  44%|████▍     | 219/500 [00:15<00:18, 14.96it/s][A[A
+
+Potts Sampling:  44%|████▍     | 221/500 [00:15<00:17, 16.14it/s][A[A
+
+Potts Sampling:  45%|████▍     | 223/500 [00:15<00:16, 17.04it/s][A[A
+
+Potts Sampling:  45%|████▌     | 225/500 [00:16<00:16, 17.03it/s][A[A
+
+Potts Sampling:  45%|████▌     | 227/500 [00:16<00:15, 17.45it/s][A[A
+
+Potts Sampling:  46%|████▌     | 229/500 [00:16<00:15, 17.70it/s][A[A
+
+Potts Sampling:  46%|████▌     | 231/500 [00:16<00:15, 17.61it/s][A[A
+
+Potts Sampling:  47%|████▋     | 233/500 [00:16<00:15, 16.79it/s][A[A
+
+Potts Sampling:  47%|████▋     | 235/500 [00:16<00:16, 16.40it/s][A[A
+
+Potts Sampling:  47%|████▋     | 237/500 [00:16<00:16, 15.58it/s][A[A
+
+Potts Sampling:  48%|████▊     | 239/500 [00:16<00:16, 15.55it/s][A[A
+
+Potts Sampling:  48%|████▊     | 241/500 [00:17<00:16, 15.38it/s][A[A
+
+Potts Sampling:  49%|████▊     | 243/500 [00:17<00:16, 15.22it/s][A[A
+
+Potts Sampling:  49%|████▉     | 245/500 [00:17<00:17, 14.93it/s][A[A
+
+Potts Sampling:  49%|████▉     | 247/500 [00:17<00:16, 15.06it/s][A[A
+
+Potts Sampling:  50%|████▉     | 249/500 [00:17<00:16, 14.82it/s][A[A
+
+Potts Sampling:  50%|█████     | 251/500 [00:17<00:16, 14.92it/s][A[A
+
+Potts Sampling:  51%|█████     | 253/500 [00:17<00:15, 15.63it/s][A[A
+
+Potts Sampling:  51%|█████     | 255/500 [00:18<00:19, 12.65it/s][A[A
+
+Potts Sampling:  51%|█████▏    | 257/500 [00:18<00:18, 12.87it/s][A[A
+
+Potts Sampling:  52%|█████▏    | 259/500 [00:18<00:17, 13.40it/s][A[A
+
+Potts Sampling:  52%|█████▏    | 261/500 [00:18<00:17, 13.94it/s][A[A
+
+Potts Sampling:  53%|█████▎    | 263/500 [00:18<00:16, 14.25it/s][A[A
+
+Potts Sampling:  53%|█████▎    | 265/500 [00:18<00:16, 14.35it/s][A[A
+
+Potts Sampling:  53%|█████▎    | 267/500 [00:18<00:16, 13.92it/s][A[A
+
+Potts Sampling:  54%|█████▍    | 269/500 [00:19<00:16, 14.01it/s][A[A
+
+Potts Sampling:  54%|█████▍    | 271/500 [00:19<00:16, 13.97it/s][A[A
+
+Potts Sampling:  55%|█████▍    | 273/500 [00:19<00:16, 13.49it/s][A[A
+
+Potts Sampling:  55%|█████▌    | 275/500 [00:19<00:16, 13.50it/s][A[A
+
+Potts Sampling:  55%|█████▌    | 277/500 [00:19<00:16, 13.91it/s][A[A
+
+Potts Sampling:  56%|█████▌    | 279/500 [00:19<00:15, 14.25it/s][A[A
+
+Potts Sampling:  56%|█████▌    | 281/500 [00:19<00:15, 14.48it/s][A[A
+
+Potts Sampling:  57%|█████▋    | 283/500 [00:20<00:14, 14.59it/s][A[A
+
+Potts Sampling:  57%|█████▋    | 285/500 [00:20<00:14, 14.64it/s][A[A
+
+Potts Sampling:  57%|█████▋    | 287/500 [00:20<00:15, 14.12it/s][A[A
+
+Potts Sampling:  58%|█████▊    | 289/500 [00:20<00:14, 14.29it/s][A[A
+
+Potts Sampling:  58%|█████▊    | 291/500 [00:20<00:14, 14.20it/s][A[A
+
+Potts Sampling:  59%|█████▊    | 293/500 [00:20<00:14, 14.26it/s][A[A
+
+Potts Sampling:  59%|█████▉    | 295/500 [00:20<00:15, 13.52it/s][A[A
+
+Potts Sampling:  59%|█████▉    | 297/500 [00:21<00:15, 13.14it/s][A[A
+
+Potts Sampling:  60%|█████▉    | 299/500 [00:21<00:15, 12.62it/s][A[A
+
+Potts Sampling:  60%|██████    | 301/500 [00:21<00:16, 11.89it/s][A[A
+
+Potts Sampling:  61%|██████    | 303/500 [00:21<00:16, 11.89it/s][A[A
+
+Potts Sampling:  61%|██████    | 305/500 [00:21<00:16, 11.82it/s][A[A
+
+Potts Sampling:  61%|██████▏   | 307/500 [00:22<00:16, 11.79it/s][A[A
+
+Potts Sampling:  62%|██████▏   | 309/500 [00:22<00:16, 11.75it/s][A[A
+
+Potts Sampling:  62%|██████▏   | 311/500 [00:22<00:15, 11.84it/s][A[A
+
+Potts Sampling:  63%|██████▎   | 313/500 [00:22<00:16, 11.48it/s][A[A
+
+Potts Sampling:  63%|██████▎   | 315/500 [00:22<00:16, 11.20it/s][A[A
+
+Potts Sampling:  63%|██████▎   | 317/500 [00:22<00:16, 11.00it/s][A[A
+
+Potts Sampling:  64%|██████▍   | 319/500 [00:23<00:16, 10.69it/s][A[A
+
+Potts Sampling:  64%|██████▍   | 321/500 [00:23<00:17,  9.96it/s][A[A
+
+Potts Sampling:  65%|██████▍   | 323/500 [00:23<00:18,  9.80it/s][A[A
+
+Potts Sampling:  65%|██████▍   | 324/500 [00:23<00:21,  8.33it/s][A[A
+
+Potts Sampling:  65%|██████▌   | 325/500 [00:23<00:22,  7.69it/s][A[A
+
+Potts Sampling:  65%|██████▌   | 326/500 [00:24<00:22,  7.61it/s][A[A
+
+Potts Sampling:  65%|██████▌   | 327/500 [00:24<00:23,  7.24it/s][A[A
+
+Potts Sampling:  66%|██████▌   | 328/500 [00:24<00:23,  7.21it/s][A[A
+
+Potts Sampling:  66%|██████▌   | 329/500 [00:24<00:24,  6.89it/s][A[A
+
+Potts Sampling:  66%|██████▌   | 330/500 [00:24<00:26,  6.49it/s][A[A
+
+Potts Sampling:  66%|██████▌   | 331/500 [00:24<00:26,  6.41it/s][A[A
+
+Potts Sampling:  66%|██████▋   | 332/500 [00:24<00:24,  7.00it/s][A[A
+
+Potts Sampling:  67%|██████▋   | 333/500 [00:25<00:22,  7.52it/s][A[A
+
+Potts Sampling:  67%|██████▋   | 334/500 [00:25<00:20,  7.99it/s][A[A
+
+Potts Sampling:  67%|██████▋   | 335/500 [00:25<00:19,  8.27it/s][A[A
+
+Potts Sampling:  67%|██████▋   | 336/500 [00:25<00:19,  8.62it/s][A[A
+
+Potts Sampling:  67%|██████▋   | 337/500 [00:25<00:18,  8.96it/s][A[A
+
+Potts Sampling:  68%|██████▊   | 339/500 [00:25<00:13, 11.88it/s][A[A
+
+Potts Sampling:  68%|██████▊   | 341/500 [00:25<00:12, 12.99it/s][A[A
+
+Potts Sampling:  69%|██████▊   | 343/500 [00:25<00:10, 14.31it/s][A[A
+
+Potts Sampling:  69%|██████▉   | 345/500 [00:25<00:10, 15.26it/s][A[A
+
+Potts Sampling:  69%|██████▉   | 347/500 [00:26<00:09, 15.90it/s][A[A
+
+Potts Sampling:  70%|██████▉   | 349/500 [00:26<00:09, 16.54it/s][A[A
+
+Potts Sampling:  70%|███████   | 351/500 [00:26<00:08, 16.97it/s][A[A
+
+Potts Sampling:  71%|███████   | 353/500 [00:26<00:08, 17.01it/s][A[A
+
+Potts Sampling:  71%|███████   | 355/500 [00:26<00:08, 16.74it/s][A[A
+
+Potts Sampling:  71%|███████▏  | 357/500 [00:26<00:08, 17.26it/s][A[A
+
+Potts Sampling:  72%|███████▏  | 359/500 [00:26<00:08, 16.70it/s][A[A
+
+Potts Sampling:  72%|███████▏  | 361/500 [00:26<00:08, 16.80it/s][A[A
+
+Potts Sampling:  73%|███████▎  | 363/500 [00:27<00:08, 16.41it/s][A[A
+
+Potts Sampling:  73%|███████▎  | 365/500 [00:27<00:08, 16.18it/s][A[A
+
+Potts Sampling:  73%|███████▎  | 367/500 [00:27<00:08, 15.92it/s][A[A
+
+Potts Sampling:  74%|███████▍  | 369/500 [00:27<00:08, 16.06it/s][A[A
+
+Potts Sampling:  74%|███████▍  | 371/500 [00:27<00:07, 16.39it/s][A[A
+
+Potts Sampling:  75%|███████▍  | 373/500 [00:27<00:07, 16.80it/s][A[A
+
+Potts Sampling:  75%|███████▌  | 375/500 [00:27<00:07, 17.00it/s][A[A
+
+Potts Sampling:  75%|███████▌  | 377/500 [00:27<00:07, 17.54it/s][A[A
+
+Potts Sampling:  76%|███████▌  | 380/500 [00:27<00:06, 19.55it/s][A[A
+
+Potts Sampling:  76%|███████▋  | 382/500 [00:28<00:06, 19.19it/s][A[A
+
+Potts Sampling:  77%|███████▋  | 384/500 [00:28<00:06, 18.82it/s][A[A
+
+Potts Sampling:  77%|███████▋  | 386/500 [00:28<00:06, 18.17it/s][A[A
+
+Potts Sampling:  78%|███████▊  | 388/500 [00:28<00:06, 17.29it/s][A[A
+
+Potts Sampling:  78%|███████▊  | 390/500 [00:28<00:06, 17.29it/s][A[A
+
+Potts Sampling:  78%|███████▊  | 392/500 [00:28<00:06, 16.99it/s][A[A
+
+Potts Sampling:  79%|███████▉  | 394/500 [00:28<00:06, 15.76it/s][A[A
+
+Potts Sampling:  79%|███████▉  | 396/500 [00:28<00:06, 15.86it/s][A[A
+
+Potts Sampling:  80%|███████▉  | 398/500 [00:29<00:06, 16.14it/s][A[A
+
+Potts Sampling:  80%|████████  | 400/500 [00:29<00:06, 16.01it/s][A[A
+
+Potts Sampling:  80%|████████  | 402/500 [00:29<00:05, 16.97it/s][A[A
+
+Potts Sampling:  81%|████████  | 404/500 [00:29<00:05, 16.35it/s][A[A
+
+Potts Sampling:  81%|████████  | 406/500 [00:29<00:05, 16.59it/s][A[A
+
+Potts Sampling:  82%|████████▏ | 408/500 [00:29<00:05, 17.06it/s][A[A
+
+Potts Sampling:  82%|████████▏ | 410/500 [00:29<00:05, 17.33it/s][A[A
+
+Potts Sampling:  82%|████████▏ | 412/500 [00:29<00:05, 16.92it/s][A[A
+
+Potts Sampling:  83%|████████▎ | 414/500 [00:30<00:05, 16.51it/s][A[A
+
+Potts Sampling:  83%|████████▎ | 416/500 [00:30<00:04, 16.99it/s][A[A
+
+Potts Sampling:  84%|████████▍ | 419/500 [00:30<00:04, 19.33it/s][A[A
+
+Potts Sampling:  84%|████████▍ | 421/500 [00:30<00:04, 19.30it/s][A[A
+
+Potts Sampling:  85%|████████▍ | 423/500 [00:30<00:04, 18.91it/s][A[A
+
+Potts Sampling:  85%|████████▌ | 425/500 [00:30<00:04, 18.03it/s][A[A
+
+Potts Sampling:  85%|████████▌ | 427/500 [00:30<00:04, 17.72it/s][A[A
+
+Potts Sampling:  86%|████████▌ | 429/500 [00:30<00:04, 16.89it/s][A[A
+
+Potts Sampling:  86%|████████▋ | 432/500 [00:30<00:03, 19.03it/s][A[A
+
+Potts Sampling:  87%|████████▋ | 435/500 [00:31<00:03, 20.47it/s][A[A
+
+Potts Sampling:  88%|████████▊ | 438/500 [00:31<00:02, 20.90it/s][A[A
+
+Potts Sampling:  88%|████████▊ | 441/500 [00:31<00:02, 20.89it/s][A[A
+
+Potts Sampling:  89%|████████▉ | 444/500 [00:31<00:02, 21.38it/s][A[A
+
+Potts Sampling:  89%|████████▉ | 447/500 [00:31<00:02, 21.80it/s][A[A
+
+Potts Sampling:  90%|█████████ | 450/500 [00:31<00:02, 21.80it/s][A[A
+
+Potts Sampling:  91%|█████████ | 453/500 [00:31<00:02, 22.32it/s][A[A
+
+Potts Sampling:  91%|█████████ | 456/500 [00:32<00:01, 22.81it/s][A[A
+
+Potts Sampling:  92%|█████████▏| 459/500 [00:32<00:01, 22.99it/s][A[A
+
+Potts Sampling:  92%|█████████▏| 462/500 [00:32<00:01, 23.85it/s][A[A
+
+Potts Sampling:  93%|█████████▎| 465/500 [00:32<00:01, 24.44it/s][A[A
+
+Potts Sampling:  94%|█████████▎| 468/500 [00:32<00:01, 25.20it/s][A[A
+
+Potts Sampling:  94%|█████████▍| 471/500 [00:32<00:01, 25.46it/s][A[A
+
+Potts Sampling:  95%|█████████▍| 474/500 [00:32<00:01, 24.76it/s][A[A
+
+Potts Sampling:  95%|█████████▌| 477/500 [00:32<00:00, 23.68it/s][A[A
+
+Potts Sampling:  96%|█████████▌| 480/500 [00:33<00:00, 22.91it/s][A[A
+
+Potts Sampling:  97%|█████████▋| 483/500 [00:33<00:00, 22.25it/s][A[A
+
+Potts Sampling:  97%|█████████▋| 486/500 [00:33<00:00, 21.79it/s][A[A
+
+Potts Sampling:  98%|█████████▊| 489/500 [00:33<00:00, 20.87it/s][A[A
+
+Potts Sampling:  98%|█████████▊| 492/500 [00:33<00:00, 19.64it/s][A[A
+
+Potts Sampling:  99%|█████████▉| 494/500 [00:33<00:00, 16.82it/s][A[A
+
+Potts Sampling:  99%|█████████▉| 496/500 [00:33<00:00, 15.31it/s][A[A
+
+Potts Sampling: 100%|█████████▉| 498/500 [00:34<00:00, 14.96it/s][A[A
+
+Potts Sampling: 100%|██████████| 500/500 [00:34<00:00, 14.09it/s][A[A
+
+                                                                 [A[A
+Sampling sequences:  12%|█▎        | 3/24 [01:45<12:15, 35.01s/it][A
+
+Potts Sampling:   0%|          | 0/500 [00:00<?, ?it/s][A[A
+
+Potts Sampling:   1%|          | 4/500 [00:00<00:12, 38.49it/s][A[A
+
+Potts Sampling:   2%|▏         | 8/500 [00:00<00:23, 21.18it/s][A[A
+
+Potts Sampling:   2%|▏         | 11/500 [00:00<00:29, 16.84it/s][A[A
+
+Potts Sampling:   3%|▎         | 13/500 [00:00<00:36, 13.38it/s][A[A
+
+Potts Sampling:   3%|▎         | 15/500 [00:00<00:36, 13.35it/s][A[A
+
+Potts Sampling:   3%|▎         | 17/500 [00:01<00:33, 14.39it/s][A[A
+
+Potts Sampling:   4%|▍         | 19/500 [00:01<00:32, 14.82it/s][A[A
+
+Potts Sampling:   4%|▍         | 21/500 [00:01<00:31, 15.20it/s][A[A
+
+Potts Sampling:   5%|▍         | 23/500 [00:01<00:30, 15.67it/s][A[A
+
+Potts Sampling:   5%|▌         | 25/500 [00:01<00:29, 16.30it/s][A[A
+
+Potts Sampling:   5%|▌         | 27/500 [00:01<00:28, 16.88it/s][A[A
+
+Potts Sampling:   6%|▌         | 30/500 [00:01<00:23, 20.05it/s][A[A
+
+Potts Sampling:   7%|▋         | 33/500 [00:01<00:22, 20.77it/s][A[A
+
+Potts Sampling:   7%|▋         | 36/500 [00:02<00:21, 21.53it/s][A[A
+
+Potts Sampling:   8%|▊         | 39/500 [00:02<00:21, 21.93it/s][A[A
+
+Potts Sampling:   8%|▊         | 42/500 [00:02<00:20, 22.48it/s][A[A
+
+Potts Sampling:   9%|▉         | 45/500 [00:02<00:20, 22.58it/s][A[A
+
+Potts Sampling:  10%|▉         | 48/500 [00:02<00:20, 22.60it/s][A[A
+
+Potts Sampling:  10%|█         | 51/500 [00:02<00:19, 22.58it/s][A[A
+
+Potts Sampling:  11%|█         | 54/500 [00:02<00:19, 22.31it/s][A[A
+
+Potts Sampling:  11%|█▏        | 57/500 [00:02<00:19, 22.93it/s][A[A
+
+Potts Sampling:  12%|█▏        | 60/500 [00:03<00:19, 22.88it/s][A[A
+
+Potts Sampling:  13%|█▎        | 63/500 [00:03<00:18, 23.05it/s][A[A
+
+Potts Sampling:  13%|█▎        | 66/500 [00:03<00:18, 23.65it/s][A[A
+
+Potts Sampling:  14%|█▍        | 69/500 [00:03<00:17, 24.19it/s][A[A
+
+Potts Sampling:  14%|█▍        | 72/500 [00:03<00:17, 24.43it/s][A[A
+
+Potts Sampling:  15%|█▌        | 75/500 [00:03<00:17, 24.96it/s][A[A
+
+Potts Sampling:  16%|█▌        | 78/500 [00:03<00:17, 24.42it/s][A[A
+
+Potts Sampling:  16%|█▌        | 81/500 [00:03<00:16, 25.08it/s][A[A
+
+Potts Sampling:  17%|█▋        | 84/500 [00:04<00:16, 25.23it/s][A[A
+
+Potts Sampling:  17%|█▋        | 87/500 [00:04<00:16, 25.23it/s][A[A
+
+Potts Sampling:  18%|█▊        | 90/500 [00:04<00:16, 24.90it/s][A[A
+
+Potts Sampling:  19%|█▊        | 93/500 [00:04<00:16, 25.04it/s][A[A
+
+Potts Sampling:  19%|█▉        | 96/500 [00:04<00:15, 25.83it/s][A[A
+
+Potts Sampling:  20%|█▉        | 99/500 [00:04<00:15, 26.67it/s][A[A
+
+Potts Sampling:  20%|██        | 102/500 [00:04<00:14, 27.35it/s][A[A
+
+Potts Sampling:  21%|██        | 105/500 [00:04<00:14, 27.08it/s][A[A
+
+Potts Sampling:  22%|██▏       | 108/500 [00:04<00:14, 27.49it/s][A[A
+
+Potts Sampling:  22%|██▏       | 111/500 [00:05<00:14, 27.55it/s][A[A
+
+Potts Sampling:  23%|██▎       | 115/500 [00:05<00:13, 29.43it/s][A[A
+
+Potts Sampling:  24%|██▎       | 118/500 [00:05<00:12, 29.40it/s][A[A
+
+Potts Sampling:  24%|██▍       | 121/500 [00:05<00:13, 28.29it/s][A[A
+
+Potts Sampling:  25%|██▍       | 124/500 [00:05<00:13, 27.88it/s][A[A
+
+Potts Sampling:  25%|██▌       | 127/500 [00:05<00:13, 27.75it/s][A[A
+
+Potts Sampling:  26%|██▌       | 130/500 [00:05<00:13, 27.16it/s][A[A
+
+Potts Sampling:  27%|██▋       | 133/500 [00:05<00:13, 27.64it/s][A[A
+
+Potts Sampling:  27%|██▋       | 136/500 [00:05<00:14, 25.83it/s][A[A
+
+Potts Sampling:  28%|██▊       | 139/500 [00:06<00:13, 26.75it/s][A[A
+
+Potts Sampling:  29%|██▊       | 143/500 [00:06<00:12, 29.26it/s][A[A
+
+Potts Sampling:  29%|██▉       | 147/500 [00:06<00:11, 31.53it/s][A[A
+
+Potts Sampling:  30%|███       | 151/500 [00:06<00:11, 30.31it/s][A[A
+
+Potts Sampling:  31%|███       | 155/500 [00:06<00:11, 29.23it/s][A[A

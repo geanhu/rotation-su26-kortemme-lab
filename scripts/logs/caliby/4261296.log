@@ -1,0 +1,417 @@
+Start: Wed Jul 22 14:28:44 PDT 2026
+qb3-id176.wynton.ucsf.edu
+==============================================================
+job_number:                 4261296
+exec_file:                  job_scripts/4261296
+submission_time:            Wed Jul 22 14:26:08 2026
+owner:                      geanhu
+uid:                        64854
+group:                      wynton-rotation
+gid:                        60001
+sge_o_home:                 /wynton/home/rotation/geanhu
+sge_o_log_name:             geanhu
+sge_o_path:                 /wynton/home/rotation/geanhu/software/caliby/envs/caliby/bin:/wynton/home/cbi/shared/software/CBI/miniforge3-24.7.1-0/condabin:/wynton/home/cbi/shared/software/CBI/miniforge3-24.7.1-0/bin:/wynton/home/ferrin/goddard/localcolabfold/localcolabfold/colabfold-conda/bin:/wynton/home/rotation/geanhu/.local/bin:/wynton/home/rotation/geanhu/bin:/opt/sge/bin:/opt/sge/bin/lx-amd64:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/wynton/home/kortemme/xingjiepan/Softwares/Rosetta/Rosetta/main/source/bin
+sge_o_shell:                /bin/bash
+sge_o_workdir:              /wynton/home/rotation/geanhu/multi-state/scripts
+sge_o_host:                 dev3
+account:                    sge
+cwd:                        /wynton/home/rotation/geanhu/multi-state/scripts
+merge:                      y
+hard resource_list:         h_rt=86400,mem_free=32G,scratch=4G
+mail_list:                  geanhu@dev3.wynton.ucsf.edu
+notify:                     FALSE
+job_name:                   caliby
+stdout_path_list:           NONE:NONE:logs/caliby/$JOB_ID.log
+jobshare:                   0
+hard_queue_list:            long.q
+shell_list:                 NONE:/bin/bash
+env_list:                   TERM=NONE
+script_file:                caliby.sh
+project:                    wynton-rotation
+binding:                    NONE
+job_type:                   NONE
+usage         1:            cpu=00:00:00, mem=0.00000 GB s, io=0.00000 GB, vmem=N/A, maxvmem=N/A
+binding       1:            NONE
+scheduling info:            (Collecting of scheduler job information is turned off)
+------Start of script-------
+#!/bin/bash
+#$ -S /bin/bash
+#$ -q long.q
+#$ -cwd
+#$ -N caliby
+#$ -o logs/caliby/$JOB_ID.log
+#$ -j y
+#$ -l h_rt=24:00:00
+#$ -l mem_free=32G
+#$ -l scratch=4G
+
+# metadata
+echo "Start: $(date)"
+echo "$(hostname)"
+[[ -n "$JOB_ID" ]] && qstat -j "$JOB_ID"
+echo "------Start of script-------"
+cat "$0"
+echo ""
+echo "-------End of script---------"
+
+# setup env
+# Load python version
+module load CBI miniforge3/24.7.1-0
+
+# Activate environment
+ENV_DIR=/wynton/home/rotation/geanhu/software/caliby/envs  # set this to your environment directory
+source ${ENV_DIR}/caliby/bin/activate
+
+# Required for AtomWorks.
+# We don't need these environment variables for our use case,
+# but AtomWorks requires them to be set, so we set them to empty strings.
+export PDB_MIRROR_PATH=""
+export CCD_MIRROR_PATH=""
+
+# Directory where model weights are stored. Weights are automatically
+# downloaded from HuggingFace on first use.
+export MODEL_PARAMS_DIR="/wynton/home/rotation/geanhu/software/caliby/model_params"
+
+# run
+python '/wynton/home/rotation/geanhu/software/caliby/caliby/eval/sampling/seq_des_ensemble.py' \
+    ckpt_name_or_path=soluble_caliby \
+    sampling_cfg_overrides.num_seqs_per_pdb=24 \
+    sampling_cfg_overrides.batch_size=1 \
+    seed=0 \
+    max_num_conformers=10 \
+    '++sampling_cfg_overrides.omit_aas=["C", "H"]' \
+    ++sampling_cfg_overrides.potts_sampling_cfg.potts_temperature=0.01 \
+    input_cfg.conformer_dir='/wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles' \
+    out_dir='/wynton/home/rotation/geanhu/multi-state/data/caliby-output/5KPE-5KPH/temp10-2'
+-------End of script---------
+Seed set to 0
+/wynton/home/rotation/geanhu/software/caliby/envs/caliby/lib/python3.12/site-packages/torch/jit/_script.py:365: DeprecationWarning: `torch.jit.script_method` is deprecated. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+Using 315 conformer directories
+Warning: Primary conformer not found for 5KPE_2_2_0, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_2_2_0/_0.pdb
+Warning: Primary conformer not found for 5KPE_2_2_1, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_2_2_1/p0.pdb
+Warning: Primary conformer not found for 5KPE_2_2_2, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_2_2_2/p0.pdb
+Warning: Primary conformer not found for 5KPE_2_2_3, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_2_2_3/p0.pdb
+Warning: Primary conformer not found for 5KPE_2_2_4, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_2_2_4/p0.pdb
+Warning: Primary conformer not found for 5KPE_2_2_5, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_2_2_5/p0.pdb
+Warning: Primary conformer not found for 5KPE_2_2_6, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_2_2_6/p0.pdb
+Warning: Primary conformer not found for 5KPE_2_2_7, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_2_2_7/p0.pdb
+Warning: Primary conformer not found for 5KPE_2_2_8, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_2_2_8/p0.pdb
+Warning: Primary conformer not found for 5KPE_2_2_9, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_2_2_9/p0.pdb
+Warning: Primary conformer not found for 5KPE_2_4_0, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_2_4_0/_0.pdb
+Warning: Primary conformer not found for 5KPE_2_4_1, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_2_4_1/p0.pdb
+Warning: Primary conformer not found for 5KPE_2_4_2, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_2_4_2/p0.pdb
+Warning: Primary conformer not found for 5KPE_2_4_3, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_2_4_3/p0.pdb
+Warning: Primary conformer not found for 5KPE_2_4_4, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_2_4_4/p0.pdb
+Warning: Primary conformer not found for 5KPE_2_4_5, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_2_4_5/p0.pdb
+Warning: Primary conformer not found for 5KPE_2_4_6, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_2_4_6/p0.pdb
+Warning: Primary conformer not found for 5KPE_2_4_7, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_2_4_7/p0.pdb
+Warning: Primary conformer not found for 5KPE_2_4_8, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_2_4_8/p0.pdb
+Warning: Primary conformer not found for 5KPE_2_4_9, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_2_4_9/p0.pdb
+Warning: Primary conformer not found for 5KPE_2_6_0, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_2_6_0/_0.pdb
+Warning: Primary conformer not found for 5KPE_2_6_1, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_2_6_1/p0.pdb
+Warning: Primary conformer not found for 5KPE_2_6_2, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_2_6_2/p0.pdb
+Warning: Primary conformer not found for 5KPE_2_6_3, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_2_6_3/p0.pdb
+Warning: Primary conformer not found for 5KPE_2_6_4, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_2_6_4/p0.pdb
+Warning: Primary conformer not found for 5KPE_2_6_5, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_2_6_5/p0.pdb
+Warning: Primary conformer not found for 5KPE_2_6_6, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_2_6_6/p0.pdb
+Warning: Primary conformer not found for 5KPE_2_6_7, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_2_6_7/p0.pdb
+Warning: Primary conformer not found for 5KPE_2_6_8, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_2_6_8/p0.pdb
+Warning: Primary conformer not found for 5KPE_2_6_9, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_2_6_9/p0.pdb
+Warning: Primary conformer not found for 5KPE_2_8_0, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_2_8_0/_0.pdb
+Warning: Primary conformer not found for 5KPE_2_8_1, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_2_8_1/p0.pdb
+Warning: Primary conformer not found for 5KPE_2_8_2, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_2_8_2/p0.pdb
+Warning: Primary conformer not found for 5KPE_2_8_3, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_2_8_3/p0.pdb
+Warning: Primary conformer not found for 5KPE_2_8_4, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_2_8_4/p0.pdb
+Warning: Primary conformer not found for 5KPE_2_8_5, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_2_8_5/p0.pdb
+Warning: Primary conformer not found for 5KPE_2_8_6, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_2_8_6/p0.pdb
+Warning: Primary conformer not found for 5KPE_2_8_7, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_2_8_7/p0.pdb
+Warning: Primary conformer not found for 5KPE_2_8_8, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_2_8_8/p0.pdb
+Warning: Primary conformer not found for 5KPE_2_8_9, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_2_8_9/p0.pdb
+Warning: Primary conformer not found for 5KPE_4_2_0, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_4_2_0/_0.pdb
+Warning: Primary conformer not found for 5KPE_4_2_1, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_4_2_1/p0.pdb
+Warning: Primary conformer not found for 5KPE_4_2_2, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_4_2_2/p0.pdb
+Warning: Primary conformer not found for 5KPE_4_2_3, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_4_2_3/p0.pdb
+Warning: Primary conformer not found for 5KPE_4_2_4, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_4_2_4/p0.pdb
+Warning: Primary conformer not found for 5KPE_4_2_5, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_4_2_5/p0.pdb
+Warning: Primary conformer not found for 5KPE_4_2_6, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_4_2_6/p0.pdb
+Warning: Primary conformer not found for 5KPE_4_2_7, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_4_2_7/p0.pdb
+Warning: Primary conformer not found for 5KPE_4_2_8, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_4_2_8/p0.pdb
+Warning: Primary conformer not found for 5KPE_4_2_9, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_4_2_9/p0.pdb
+Warning: Primary conformer not found for 5KPE_4_4_0, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_4_4_0/_0.pdb
+Warning: Primary conformer not found for 5KPE_4_4_1, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_4_4_1/p0.pdb
+Warning: Primary conformer not found for 5KPE_4_4_2, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_4_4_2/p0.pdb
+Warning: Primary conformer not found for 5KPE_4_4_3, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_4_4_3/p0.pdb
+Warning: Primary conformer not found for 5KPE_4_4_4, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_4_4_4/p0.pdb
+Warning: Primary conformer not found for 5KPE_4_4_5, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_4_4_5/p0.pdb
+Warning: Primary conformer not found for 5KPE_4_4_6, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_4_4_6/p0.pdb
+Warning: Primary conformer not found for 5KPE_4_4_7, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_4_4_7/p0.pdb
+Warning: Primary conformer not found for 5KPE_4_4_8, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_4_4_8/p0.pdb
+Warning: Primary conformer not found for 5KPE_4_4_9, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_4_4_9/p0.pdb
+Warning: Primary conformer not found for 5KPE_4_6_0, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_4_6_0/_0.pdb
+Warning: Primary conformer not found for 5KPE_4_6_1, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_4_6_1/p0.pdb
+Warning: Primary conformer not found for 5KPE_4_6_2, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_4_6_2/p0.pdb
+Warning: Primary conformer not found for 5KPE_4_6_3, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_4_6_3/p0.pdb
+Warning: Primary conformer not found for 5KPE_4_6_4, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_4_6_4/p0.pdb
+Warning: Primary conformer not found for 5KPE_4_6_5, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_4_6_5/p0.pdb
+Warning: Primary conformer not found for 5KPE_4_6_6, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_4_6_6/p0.pdb
+Warning: Primary conformer not found for 5KPE_4_6_7, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_4_6_7/p0.pdb
+Warning: Primary conformer not found for 5KPE_4_6_8, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_4_6_8/p0.pdb
+Warning: Primary conformer not found for 5KPE_4_6_9, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_4_6_9/p0.pdb
+Warning: Primary conformer not found for 5KPE_4_8_0, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_4_8_0/_0.pdb
+Warning: Primary conformer not found for 5KPE_4_8_1, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_4_8_1/p0.pdb
+Warning: Primary conformer not found for 5KPE_4_8_2, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_4_8_2/p0.pdb
+Warning: Primary conformer not found for 5KPE_4_8_3, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_4_8_3/p0.pdb
+Warning: Primary conformer not found for 5KPE_4_8_4, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_4_8_4/p0.pdb
+Warning: Primary conformer not found for 5KPE_4_8_5, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_4_8_5/p0.pdb
+Warning: Primary conformer not found for 5KPE_4_8_6, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_4_8_6/p0.pdb
+Warning: Primary conformer not found for 5KPE_4_8_7, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_4_8_7/p0.pdb
+Warning: Primary conformer not found for 5KPE_4_8_8, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_4_8_8/p0.pdb
+Warning: Primary conformer not found for 5KPE_4_8_9, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_4_8_9/p0.pdb
+Warning: Primary conformer not found for 5KPE_6_2_0, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_6_2_0/_0.pdb
+Warning: Primary conformer not found for 5KPE_6_2_1, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_6_2_1/p0.pdb
+Warning: Primary conformer not found for 5KPE_6_2_2, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_6_2_2/p0.pdb
+Warning: Primary conformer not found for 5KPE_6_2_3, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_6_2_3/p0.pdb
+Warning: Primary conformer not found for 5KPE_6_2_4, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_6_2_4/p0.pdb
+Warning: Primary conformer not found for 5KPE_6_2_5, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_6_2_5/p0.pdb
+Warning: Primary conformer not found for 5KPE_6_2_6, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_6_2_6/p0.pdb
+Warning: Primary conformer not found for 5KPE_6_2_7, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_6_2_7/p0.pdb
+Warning: Primary conformer not found for 5KPE_6_2_9, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_6_2_9/p0.pdb
+Warning: Primary conformer not found for 5KPE_6_4_0, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_6_4_0/_0.pdb
+Warning: Primary conformer not found for 5KPE_6_4_1, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_6_4_1/p0.pdb
+Warning: Primary conformer not found for 5KPE_6_4_2, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_6_4_2/p0.pdb
+Warning: Primary conformer not found for 5KPE_6_4_3, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_6_4_3/p0.pdb
+Warning: Primary conformer not found for 5KPE_6_4_4, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_6_4_4/p0.pdb
+Warning: Primary conformer not found for 5KPE_6_4_5, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_6_4_5/p0.pdb
+Warning: Primary conformer not found for 5KPE_6_4_6, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_6_4_6/p0.pdb
+Warning: Primary conformer not found for 5KPE_6_4_7, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_6_4_7/p0.pdb
+Warning: Primary conformer not found for 5KPE_6_4_8, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_6_4_8/p0.pdb
+Warning: Primary conformer not found for 5KPE_6_4_9, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_6_4_9/p0.pdb
+Warning: Primary conformer not found for 5KPE_6_6_0, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_6_6_0/_0.pdb
+Warning: Primary conformer not found for 5KPE_6_6_1, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_6_6_1/p0.pdb
+Warning: Primary conformer not found for 5KPE_6_6_2, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_6_6_2/p0.pdb
+Warning: Primary conformer not found for 5KPE_6_6_3, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_6_6_3/p0.pdb
+Warning: Primary conformer not found for 5KPE_6_6_4, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_6_6_4/p0.pdb
+Warning: Primary conformer not found for 5KPE_6_6_5, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_6_6_5/p0.pdb
+Warning: Primary conformer not found for 5KPE_6_6_6, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_6_6_6/p0.pdb
+Warning: Primary conformer not found for 5KPE_6_6_7, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_6_6_7/p0.pdb
+Warning: Primary conformer not found for 5KPE_6_6_8, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_6_6_8/p0.pdb
+Warning: Primary conformer not found for 5KPE_6_6_9, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_6_6_9/p0.pdb
+Warning: Primary conformer not found for 5KPE_6_8_0, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_6_8_0/_0.pdb
+Warning: Primary conformer not found for 5KPE_6_8_1, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_6_8_1/p0.pdb
+Warning: Primary conformer not found for 5KPE_6_8_2, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_6_8_2/p0.pdb
+Warning: Primary conformer not found for 5KPE_6_8_3, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_6_8_3/p0.pdb
+Warning: Primary conformer not found for 5KPE_6_8_4, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_6_8_4/p0.pdb
+Warning: Primary conformer not found for 5KPE_6_8_5, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_6_8_5/p0.pdb
+Warning: Primary conformer not found for 5KPE_6_8_6, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_6_8_6/p0.pdb
+Warning: Primary conformer not found for 5KPE_6_8_7, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_6_8_7/p0.pdb
+Warning: Primary conformer not found for 5KPE_6_8_8, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_6_8_8/p0.pdb
+Warning: Primary conformer not found for 5KPE_6_8_9, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_6_8_9/p0.pdb
+Warning: Primary conformer not found for 5KPE_8_2_0, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_8_2_0/_0.pdb
+Warning: Primary conformer not found for 5KPE_8_2_1, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_8_2_1/p0.pdb
+Warning: Primary conformer not found for 5KPE_8_2_2, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_8_2_2/p0.pdb
+Warning: Primary conformer not found for 5KPE_8_2_3, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_8_2_3/p0.pdb
+Warning: Primary conformer not found for 5KPE_8_2_4, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_8_2_4/p0.pdb
+Warning: Primary conformer not found for 5KPE_8_2_5, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_8_2_5/p0.pdb
+Warning: Primary conformer not found for 5KPE_8_2_6, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_8_2_6/p0.pdb
+Warning: Primary conformer not found for 5KPE_8_2_7, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_8_2_7/p0.pdb
+Warning: Primary conformer not found for 5KPE_8_2_8, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_8_2_8/p0.pdb
+Warning: Primary conformer not found for 5KPE_8_2_9, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_8_2_9/p0.pdb
+Warning: Primary conformer not found for 5KPE_8_4_0, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_8_4_0/_0.pdb
+Warning: Primary conformer not found for 5KPE_8_4_1, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_8_4_1/p0.pdb
+Warning: Primary conformer not found for 5KPE_8_4_2, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_8_4_2/p0.pdb
+Warning: Primary conformer not found for 5KPE_8_4_3, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_8_4_3/p0.pdb
+Warning: Primary conformer not found for 5KPE_8_4_4, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_8_4_4/p0.pdb
+Warning: Primary conformer not found for 5KPE_8_4_5, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_8_4_5/p0.pdb
+Warning: Primary conformer not found for 5KPE_8_4_6, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_8_4_6/p0.pdb
+Warning: Primary conformer not found for 5KPE_8_4_7, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_8_4_7/p0.pdb
+Warning: Primary conformer not found for 5KPE_8_4_8, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_8_4_8/p0.pdb
+Warning: Primary conformer not found for 5KPE_8_4_9, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_8_4_9/p0.pdb
+Warning: Primary conformer not found for 5KPE_8_6_0, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_8_6_0/_0.pdb
+Warning: Primary conformer not found for 5KPE_8_6_1, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_8_6_1/p0.pdb
+Warning: Primary conformer not found for 5KPE_8_6_2, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_8_6_2/p0.pdb
+Warning: Primary conformer not found for 5KPE_8_6_3, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_8_6_3/p0.pdb
+Warning: Primary conformer not found for 5KPE_8_6_4, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_8_6_4/p0.pdb
+Warning: Primary conformer not found for 5KPE_8_6_5, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_8_6_5/p0.pdb
+Warning: Primary conformer not found for 5KPE_8_6_6, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_8_6_6/p0.pdb
+Warning: Primary conformer not found for 5KPE_8_6_7, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_8_6_7/p0.pdb
+Warning: Primary conformer not found for 5KPE_8_6_8, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_8_6_8/p0.pdb
+Warning: Primary conformer not found for 5KPE_8_6_9, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_8_6_9/p0.pdb
+Warning: Primary conformer not found for 5KPE_8_8_0, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_8_8_0/_0.pdb
+Warning: Primary conformer not found for 5KPE_8_8_1, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_8_8_1/p0.pdb
+Warning: Primary conformer not found for 5KPE_8_8_2, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_8_8_2/p0.pdb
+Warning: Primary conformer not found for 5KPE_8_8_3, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_8_8_3/p0.pdb
+Warning: Primary conformer not found for 5KPE_8_8_4, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_8_8_4/p0.pdb
+Warning: Primary conformer not found for 5KPE_8_8_5, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_8_8_5/p0.pdb
+Warning: Primary conformer not found for 5KPE_8_8_6, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_8_8_6/p0.pdb
+Warning: Primary conformer not found for 5KPE_8_8_7, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_8_8_7/p0.pdb
+Warning: Primary conformer not found for 5KPE_8_8_8, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_8_8_8/p0.pdb
+Warning: Primary conformer not found for 5KPE_8_8_9, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPE_8_8_9/p0.pdb
+Warning: Primary conformer not found for 5KPH_2_2_0, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_2_2_0/_0.pdb
+Warning: Primary conformer not found for 5KPH_2_2_1, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_2_2_1/p0.pdb
+Warning: Primary conformer not found for 5KPH_2_2_2, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_2_2_2/p0.pdb
+Warning: Primary conformer not found for 5KPH_2_2_3, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_2_2_3/p0.pdb
+Warning: Primary conformer not found for 5KPH_2_2_4, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_2_2_4/p0.pdb
+Warning: Primary conformer not found for 5KPH_2_2_5, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_2_2_5/p0.pdb
+Warning: Primary conformer not found for 5KPH_2_2_6, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_2_2_6/p0.pdb
+Warning: Primary conformer not found for 5KPH_2_2_7, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_2_2_7/p0.pdb
+Warning: Primary conformer not found for 5KPH_2_2_8, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_2_2_8/p0.pdb
+Warning: Primary conformer not found for 5KPH_2_2_9, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_2_2_9/p0.pdb
+Warning: Primary conformer not found for 5KPH_2_4_0, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_2_4_0/_0.pdb
+Warning: Primary conformer not found for 5KPH_2_4_1, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_2_4_1/p0.pdb
+Warning: Primary conformer not found for 5KPH_2_4_2, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_2_4_2/p0.pdb
+Warning: Primary conformer not found for 5KPH_2_4_3, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_2_4_3/p0.pdb
+Warning: Primary conformer not found for 5KPH_2_4_4, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_2_4_4/p0.pdb
+Warning: Primary conformer not found for 5KPH_2_4_5, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_2_4_5/p0.pdb
+Warning: Primary conformer not found for 5KPH_2_4_6, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_2_4_6/p0.pdb
+Warning: Primary conformer not found for 5KPH_2_4_7, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_2_4_7/p0.pdb
+Warning: Primary conformer not found for 5KPH_2_4_8, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_2_4_8/p0.pdb
+Warning: Primary conformer not found for 5KPH_2_4_9, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_2_4_9/p0.pdb
+Warning: Primary conformer not found for 5KPH_2_6_0, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_2_6_0/_0.pdb
+Warning: Primary conformer not found for 5KPH_2_6_1, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_2_6_1/p0.pdb
+Warning: Primary conformer not found for 5KPH_2_6_2, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_2_6_2/p0.pdb
+Warning: Primary conformer not found for 5KPH_2_6_3, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_2_6_3/p0.pdb
+Warning: Primary conformer not found for 5KPH_2_6_4, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_2_6_4/p0.pdb
+Warning: Primary conformer not found for 5KPH_2_6_5, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_2_6_5/p0.pdb
+Warning: Primary conformer not found for 5KPH_2_6_6, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_2_6_6/p0.pdb
+Warning: Primary conformer not found for 5KPH_2_6_7, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_2_6_7/p0.pdb
+Warning: Primary conformer not found for 5KPH_2_6_8, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_2_6_8/p0.pdb
+Warning: Primary conformer not found for 5KPH_2_6_9, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_2_6_9/p0.pdb
+Warning: Primary conformer not found for 5KPH_2_8_0, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_2_8_0/_0.pdb
+Warning: Primary conformer not found for 5KPH_2_8_1, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_2_8_1/p0.pdb
+Warning: Primary conformer not found for 5KPH_2_8_2, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_2_8_2/p0.pdb
+Warning: Primary conformer not found for 5KPH_2_8_3, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_2_8_3/p0.pdb
+Warning: Primary conformer not found for 5KPH_2_8_4, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_2_8_4/p0.pdb
+Warning: Primary conformer not found for 5KPH_2_8_5, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_2_8_5/p0.pdb
+Warning: Primary conformer not found for 5KPH_2_8_6, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_2_8_6/p0.pdb
+Warning: Primary conformer not found for 5KPH_2_8_7, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_2_8_7/p0.pdb
+Warning: Primary conformer not found for 5KPH_2_8_8, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_2_8_8/p0.pdb
+Warning: Primary conformer not found for 5KPH_2_8_9, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_2_8_9/p0.pdb
+Warning: Primary conformer not found for 5KPH_4_2_0, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_4_2_0/_0.pdb
+Warning: Primary conformer not found for 5KPH_4_2_1, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_4_2_1/p0.pdb
+Warning: Primary conformer not found for 5KPH_4_2_2, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_4_2_2/p0.pdb
+Warning: Primary conformer not found for 5KPH_4_2_3, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_4_2_3/p0.pdb
+Warning: Primary conformer not found for 5KPH_4_2_4, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_4_2_4/p0.pdb
+Warning: Primary conformer not found for 5KPH_4_2_5, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_4_2_5/p0.pdb
+Warning: Primary conformer not found for 5KPH_4_2_6, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_4_2_6/p0.pdb
+Warning: Primary conformer not found for 5KPH_4_2_7, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_4_2_7/p0.pdb
+Warning: Primary conformer not found for 5KPH_4_2_8, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_4_2_8/p0.pdb
+Warning: Primary conformer not found for 5KPH_4_2_9, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_4_2_9/p0.pdb
+Warning: Primary conformer not found for 5KPH_4_4_0, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_4_4_0/_0.pdb
+Warning: Primary conformer not found for 5KPH_4_4_1, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_4_4_1/p0.pdb
+Warning: Primary conformer not found for 5KPH_4_4_2, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_4_4_2/p0.pdb
+Warning: Primary conformer not found for 5KPH_4_4_3, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_4_4_3/p0.pdb
+Warning: Primary conformer not found for 5KPH_4_4_4, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_4_4_4/p0.pdb
+Warning: Primary conformer not found for 5KPH_4_4_5, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_4_4_5/p0.pdb
+Warning: Primary conformer not found for 5KPH_4_4_6, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_4_4_6/p0.pdb
+Warning: Primary conformer not found for 5KPH_4_4_7, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_4_4_7/p0.pdb
+Warning: Primary conformer not found for 5KPH_4_4_8, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_4_4_8/p0.pdb
+Warning: Primary conformer not found for 5KPH_4_4_9, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_4_4_9/p0.pdb
+Warning: Primary conformer not found for 5KPH_4_6_0, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_4_6_0/_0.pdb
+Warning: Primary conformer not found for 5KPH_4_6_1, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_4_6_1/p0.pdb
+Warning: Primary conformer not found for 5KPH_4_6_2, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_4_6_2/p0.pdb
+Warning: Primary conformer not found for 5KPH_4_6_3, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_4_6_3/p0.pdb
+Warning: Primary conformer not found for 5KPH_4_6_4, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_4_6_4/p0.pdb
+Warning: Primary conformer not found for 5KPH_4_6_5, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_4_6_5/p0.pdb
+Warning: Primary conformer not found for 5KPH_4_6_6, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_4_6_6/p0.pdb
+Warning: Primary conformer not found for 5KPH_4_6_7, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_4_6_7/p0.pdb
+Warning: Primary conformer not found for 5KPH_4_6_8, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_4_6_8/p0.pdb
+Warning: Primary conformer not found for 5KPH_4_6_9, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_4_6_9/p0.pdb
+Warning: Primary conformer not found for 5KPH_4_8_0, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_4_8_0/_0.pdb
+Warning: Primary conformer not found for 5KPH_4_8_1, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_4_8_1/p0.pdb
+Warning: Primary conformer not found for 5KPH_4_8_2, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_4_8_2/p0.pdb
+Warning: Primary conformer not found for 5KPH_4_8_3, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_4_8_3/p0.pdb
+Warning: Primary conformer not found for 5KPH_4_8_4, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_4_8_4/p0.pdb
+Warning: Primary conformer not found for 5KPH_4_8_5, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_4_8_5/p0.pdb
+Warning: Primary conformer not found for 5KPH_4_8_6, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_4_8_6/p0.pdb
+Warning: Primary conformer not found for 5KPH_4_8_7, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_4_8_7/p0.pdb
+Warning: Primary conformer not found for 5KPH_4_8_8, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_4_8_8/p0.pdb
+Warning: Primary conformer not found for 5KPH_4_8_9, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_4_8_9/p0.pdb
+Warning: Primary conformer not found for 5KPH_6_2_0, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_6_2_0/_0.pdb
+Warning: Primary conformer not found for 5KPH_6_2_1, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_6_2_1/p0.pdb
+Warning: Primary conformer not found for 5KPH_6_2_2, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_6_2_2/p0.pdb
+Warning: Primary conformer not found for 5KPH_6_2_3, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_6_2_3/p0.pdb
+Warning: Primary conformer not found for 5KPH_6_2_4, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_6_2_4/p0.pdb
+Warning: Primary conformer not found for 5KPH_6_2_5, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_6_2_5/p0.pdb
+Warning: Primary conformer not found for 5KPH_6_2_6, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_6_2_6/p0.pdb
+Warning: Primary conformer not found for 5KPH_6_2_7, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_6_2_7/p0.pdb
+Warning: Primary conformer not found for 5KPH_6_2_8, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_6_2_8/p0.pdb
+Warning: Primary conformer not found for 5KPH_6_2_9, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_6_2_9/p0.pdb
+Warning: Primary conformer not found for 5KPH_6_4_0, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_6_4_0/_0.pdb
+Warning: Primary conformer not found for 5KPH_6_4_1, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_6_4_1/p0.pdb
+Warning: Primary conformer not found for 5KPH_6_4_2, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_6_4_2/p0.pdb
+Warning: Primary conformer not found for 5KPH_6_4_3, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_6_4_3/p0.pdb
+Warning: Primary conformer not found for 5KPH_6_4_4, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_6_4_4/p0.pdb
+Warning: Primary conformer not found for 5KPH_6_4_5, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_6_4_5/p0.pdb
+Warning: Primary conformer not found for 5KPH_6_4_6, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_6_4_6/p0.pdb
+Warning: Primary conformer not found for 5KPH_6_4_7, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_6_4_7/p0.pdb
+Warning: Primary conformer not found for 5KPH_6_4_8, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_6_4_8/p0.pdb
+Warning: Primary conformer not found for 5KPH_6_4_9, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_6_4_9/p0.pdb
+Warning: Primary conformer not found for 5KPH_6_6_0, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_6_6_0/_0.pdb
+Warning: Primary conformer not found for 5KPH_6_6_1, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_6_6_1/p0.pdb
+Warning: Primary conformer not found for 5KPH_6_6_2, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_6_6_2/p0.pdb
+Warning: Primary conformer not found for 5KPH_6_6_3, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_6_6_3/p0.pdb
+Warning: Primary conformer not found for 5KPH_6_6_4, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_6_6_4/p0.pdb
+Warning: Primary conformer not found for 5KPH_6_6_5, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_6_6_5/p0.pdb
+Warning: Primary conformer not found for 5KPH_6_6_6, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_6_6_6/p0.pdb
+Warning: Primary conformer not found for 5KPH_6_6_7, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_6_6_7/p0.pdb
+Warning: Primary conformer not found for 5KPH_6_6_8, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_6_6_8/p0.pdb
+Warning: Primary conformer not found for 5KPH_6_6_9, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_6_6_9/p0.pdb
+Warning: Primary conformer not found for 5KPH_6_8_0, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_6_8_0/_0.pdb
+Warning: Primary conformer not found for 5KPH_6_8_1, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_6_8_1/p0.pdb
+Warning: Primary conformer not found for 5KPH_6_8_2, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_6_8_2/p0.pdb
+Warning: Primary conformer not found for 5KPH_6_8_3, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_6_8_3/p0.pdb
+Warning: Primary conformer not found for 5KPH_6_8_4, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_6_8_4/p0.pdb
+Warning: Primary conformer not found for 5KPH_6_8_5, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_6_8_5/p0.pdb
+Warning: Primary conformer not found for 5KPH_6_8_6, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_6_8_6/p0.pdb
+Warning: Primary conformer not found for 5KPH_6_8_7, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_6_8_7/p0.pdb
+Warning: Primary conformer not found for 5KPH_6_8_8, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_6_8_8/p0.pdb
+Warning: Primary conformer not found for 5KPH_6_8_9, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_6_8_9/p0.pdb
+Warning: Primary conformer not found for 5KPH_8_2_1, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_8_2_1/p0.pdb
+Warning: Primary conformer not found for 5KPH_8_2_3, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_8_2_3/p0.pdb
+Warning: Primary conformer not found for 5KPH_8_2_4, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_8_2_4/p0.pdb
+Warning: Primary conformer not found for 5KPH_8_2_5, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_8_2_5/p0.pdb
+Warning: Primary conformer not found for 5KPH_8_2_6, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_8_2_6/p0.pdb
+Warning: Primary conformer not found for 5KPH_8_2_9, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_8_2_9/p0.pdb
+Warning: Primary conformer not found for 5KPH_8_4_0, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_8_4_0/_0.pdb
+Warning: Primary conformer not found for 5KPH_8_4_1, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_8_4_1/p0.pdb
+Warning: Primary conformer not found for 5KPH_8_4_2, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_8_4_2/p0.pdb
+Warning: Primary conformer not found for 5KPH_8_4_3, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_8_4_3/p0.pdb
+Warning: Primary conformer not found for 5KPH_8_4_4, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_8_4_4/p0.pdb
+Warning: Primary conformer not found for 5KPH_8_4_5, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_8_4_5/p0.pdb
+Warning: Primary conformer not found for 5KPH_8_4_6, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_8_4_6/p0.pdb
+Warning: Primary conformer not found for 5KPH_8_4_7, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_8_4_7/p0.pdb
+Warning: Primary conformer not found for 5KPH_8_4_8, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_8_4_8/p0.pdb
+Warning: Primary conformer not found for 5KPH_8_4_9, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_8_4_9/p0.pdb
+Warning: Primary conformer not found for 5KPH_8_6_0, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_8_6_0/_0.pdb
+Warning: Primary conformer not found for 5KPH_8_6_1, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_8_6_1/p0.pdb
+Warning: Primary conformer not found for 5KPH_8_6_2, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_8_6_2/p0.pdb
+Warning: Primary conformer not found for 5KPH_8_6_3, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_8_6_3/p0.pdb
+Warning: Primary conformer not found for 5KPH_8_6_4, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_8_6_4/p0.pdb
+Warning: Primary conformer not found for 5KPH_8_6_5, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_8_6_5/p0.pdb
+Warning: Primary conformer not found for 5KPH_8_6_6, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_8_6_6/p0.pdb
+Warning: Primary conformer not found for 5KPH_8_6_7, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_8_6_7/p0.pdb
+Warning: Primary conformer not found for 5KPH_8_6_8, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_8_6_8/p0.pdb
+Warning: Primary conformer not found for 5KPH_8_6_9, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_8_6_9/p0.pdb
+Warning: Primary conformer not found for 5KPH_8_8_0, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_8_8_0/_0.pdb
+Warning: Primary conformer not found for 5KPH_8_8_1, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_8_8_1/p0.pdb
+Warning: Primary conformer not found for 5KPH_8_8_2, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_8_8_2/p0.pdb
+Warning: Primary conformer not found for 5KPH_8_8_3, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_8_8_3/p0.pdb
+Warning: Primary conformer not found for 5KPH_8_8_4, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_8_8_4/p0.pdb
+Warning: Primary conformer not found for 5KPH_8_8_5, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_8_8_5/p0.pdb
+Warning: Primary conformer not found for 5KPH_8_8_6, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_8_8_6/p0.pdb
+Warning: Primary conformer not found for 5KPH_8_8_7, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_8_8_7/p0.pdb
+Warning: Primary conformer not found for 5KPH_8_8_8, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_8_8_8/p0.pdb
+Warning: Primary conformer not found for 5KPH_8_8_9, defaulting to first conformer in natsorted list /wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles/5KPH_8_8_9/p0.pdb
+Using torch.compile to optimize model performance...
+Error executing job with overrides: ['ckpt_name_or_path=soluble_caliby', 'sampling_cfg_overrides.num_seqs_per_pdb=24', 'sampling_cfg_overrides.batch_size=1', 'seed=0', 'max_num_conformers=10', '++sampling_cfg_overrides.omit_aas=["C", "H"]', '++sampling_cfg_overrides.potts_sampling_cfg.potts_temperature=0.01', 'input_cfg.conformer_dir=/wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles', 'out_dir=/wynton/home/rotation/geanhu/multi-state/data/caliby-output/5KPE-5KPH/temp10-2']
+Traceback (most recent call last):
+  File "/wynton/home/rotation/geanhu/software/caliby/caliby/eval/sampling/seq_des_ensemble.py", line 53, in main
+    seq_des_model = get_seq_des_model(cfg.seq_des_cfg, device=device)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/wynton/home/rotation/geanhu/software/caliby/caliby/eval/eval_utils/seq_des_utils.py", line 85, in get_seq_des_model
+    sampling_cfg = OmegaConf.load(cfg.atom_mpnn.sampling_cfg)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/wynton/home/rotation/geanhu/multi-state/scripts/caliby/configs/seq_des/inference.yaml'
+
+Set the environment variable HYDRA_FULL_ERROR=1 for a complete stack trace.
