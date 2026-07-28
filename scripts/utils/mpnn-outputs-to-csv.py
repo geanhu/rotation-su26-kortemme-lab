@@ -44,7 +44,7 @@ def main():
                     sequence = sequence.split(':')[0]
                 
                 # store into dict
-                name = name[0] + '_id' + name[1][-1] #name_id0
+                name = name[0] + '_id' + name[1].split('=')[1] #name_id0
                 sequences['id'].append(name)
                 sequences['sequence'].append(sequence)
     

@@ -5,7 +5,7 @@
 #$ -N caliby
 #$ -o logs/caliby/$JOB_ID.log
 #$ -j y
-#$ -l h_rt=48:00:00
+#$ -l h_rt=20:00:00
 #$ -l mem_free=32G
 #$ -l scratch=4G
 
@@ -17,6 +17,9 @@ echo "------Start of script-------"
 cat "$0"
 echo ""
 echo "-------End of script---------"
+
+# disable GPU
+export CUDA_VISIBLE_DEVICES=""
 
 # setup env
 cd '/wynton/home/rotation/geanhu/software/caliby'
@@ -44,8 +47,11 @@ python '/wynton/home/rotation/geanhu/software/caliby/caliby/eval/sampling/seq_de
     sampling_cfg_overrides.num_seqs_per_pdb=24 \
     sampling_cfg_overrides.batch_size=1 \
     seed=0 \
-    max_num_conformers=10 \
+    max_num_conformers=2 \
     '++sampling_cfg_overrides.omit_aas=["C", "H"]' \
-    ++sampling_cfg_overrides.potts_sampling_cfg.potts_temperature=0.01 \
-    input_cfg.conformer_dir='/wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles' \
-    out_dir='/wynton/home/rotation/geanhu/multi-state/data/caliby-output/5KPE-5KPH/temp10-2'
+    ++sampling_cfg_overrides.potts_sampling_cfg.potts_temperature=0.1 \
+    input_cfg.conformer_dir='/wynton/home/rotation/geanhu/multi-state/data/diffusion-output/5KPE-5KPH/ensembles' \
+    out_dir='/wynton/home/rotation/geanhu/multi-state/data/caliby-output/5KPE-5KPH_refined/temp10-1'
+
+# end
+echo "End: $(date)"

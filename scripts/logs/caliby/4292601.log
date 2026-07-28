@@ -1,0 +1,156 @@
+Start: Fri Jul 24 11:00:48 PDT 2026
+qb3-atgpu35.wynton.ucsf.edu
+==============================================================
+job_number:                 4292601
+exec_file:                  job_scripts/4292601
+submission_time:            Fri Jul 24 10:59:14 2026
+owner:                      geanhu
+uid:                        64854
+group:                      wynton-rotation
+gid:                        60001
+sge_o_home:                 /wynton/home/rotation/geanhu
+sge_o_log_name:             geanhu
+sge_o_path:                 /wynton/home/cbi/shared/software/CBI/miniforge3-26.3.2-2/condabin:/wynton/home/cbi/shared/software/CBI/miniforge3-26.3.2-2/bin:/wynton/home/rotation/geanhu/.local/bin:/wynton/home/rotation/geanhu/bin:/opt/sge/bin:/opt/sge/bin/lx-amd64:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/wynton/home/ferrin/goddard/localcolabfold/localcolabfold/colabfold-conda/bin:/wynton/home/kortemme/xingjiepan/Softwares/Rosetta/Rosetta/main/source/bin
+sge_o_shell:                /bin/bash
+sge_o_workdir:              /wynton/home/rotation/geanhu/multi-state/scripts
+sge_o_host:                 dev2
+account:                    sge
+cwd:                        /wynton/home/rotation/geanhu/multi-state/scripts
+merge:                      y
+hard resource_list:         h_rt=86400,mem_free=32G,scratch=4G
+mail_list:                  geanhu@dev2.wynton.ucsf.edu
+notify:                     FALSE
+job_name:                   caliby
+stdout_path_list:           NONE:NONE:logs/caliby/$JOB_ID.log
+jobshare:                   0
+hard_queue_list:            long.q
+shell_list:                 NONE:/bin/bash
+env_list:                   TERM=NONE
+script_file:                caliby.sh
+project:                    wynton-rotation
+binding:                    NONE
+job_type:                   NONE
+usage         1:            cpu=00:00:00, mem=0.00000 GB s, io=0.00000 GB, vmem=N/A, maxvmem=N/A
+binding       1:            NONE
+scheduling info:            (Collecting of scheduler job information is turned off)
+------Start of script-------
+#!/bin/bash
+#$ -S /bin/bash
+#$ -q long.q
+#$ -cwd
+#$ -N caliby
+#$ -o logs/caliby/$JOB_ID.log
+#$ -j y
+#$ -l h_rt=24:00:00
+#$ -l mem_free=32G
+#$ -l scratch=4G
+
+# metadata
+echo "Start: $(date)"
+echo "$(hostname)"
+[[ -n "$JOB_ID" ]] && qstat -j "$JOB_ID"
+echo "------Start of script-------"
+cat "$0"
+echo ""
+echo "-------End of script---------"
+
+# setup env
+cd '/wynton/home/rotation/geanhu/software/caliby'
+
+# Load python version
+module load CBI miniforge3/24.7.1-0
+
+# Activate environment
+ENV_DIR=/wynton/home/rotation/geanhu/software/caliby/envs  # set this to your environment directory
+source ${ENV_DIR}/caliby/bin/activate
+
+# Required for AtomWorks.
+# We don't need these environment variables for our use case,
+# but AtomWorks requires them to be set, so we set them to empty strings.
+export PDB_MIRROR_PATH=""
+export CCD_MIRROR_PATH=""
+
+# Directory where model weights are stored. Weights are automatically
+# downloaded from HuggingFace on first use.
+export MODEL_PARAMS_DIR="/wynton/home/rotation/geanhu/software/caliby/model_params"
+
+# run
+python '/wynton/home/rotation/geanhu/software/caliby/caliby/eval/sampling/seq_des_ensemble.py' \
+    ckpt_name_or_path=soluble_caliby \
+    sampling_cfg_overrides.num_seqs_per_pdb=24 \
+    sampling_cfg_overrides.batch_size=1 \
+    seed=0 \
+    max_num_conformers=2 \
+    '++sampling_cfg_overrides.omit_aas=["C", "H"]' \
+    ++sampling_cfg_overrides.potts_sampling_cfg.potts_temperature=0.1 \
+    input_cfg.conformer_dir='/wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles' \
+    out_dir='/wynton/home/rotation/geanhu/multi-state/data/caliby-output/5KPE-5KPH/temp10-1'
+
+# end
+echo "End: $(date)"
+-------End of script---------
+Seed set to 0
+Using 172 conformer directories
+Error executing job with overrides: ['ckpt_name_or_path=soluble_caliby', 'sampling_cfg_overrides.num_seqs_per_pdb=24', 'sampling_cfg_overrides.batch_size=1', 'seed=0', 'max_num_conformers=2', '++sampling_cfg_overrides.omit_aas=["C", "H"]', '++sampling_cfg_overrides.potts_sampling_cfg.potts_temperature=0.1', 'input_cfg.conformer_dir=/wynton/home/rotation/geanhu/multi-state/data/string-sampling/ensembles', 'out_dir=/wynton/home/rotation/geanhu/multi-state/data/caliby-output/5KPE-5KPH/temp10-1']
+Traceback (most recent call last):
+  File "/wynton/home/rotation/geanhu/software/caliby/caliby/eval/sampling/seq_des_ensemble.py", line 53, in main
+    seq_des_model = get_seq_des_model(cfg.seq_des_cfg, device=device)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/wynton/home/rotation/geanhu/software/caliby/caliby/eval/eval_utils/seq_des_utils.py", line 82, in get_seq_des_model
+    lit_sd_model = load_from_checkpoint(LitSeqDenoiser, ckpt_path).eval()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/wynton/home/rotation/geanhu/software/caliby/caliby/checkpoint_utils.py", line 17, in load_from_checkpoint
+    return model_cls.load_from_checkpoint(ckpt_path, **_LOAD_CKPT_KWARGS)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/wynton/home/rotation/geanhu/software/caliby/envs/caliby/lib/python3.12/site-packages/lightning/pytorch/utilities/model_helpers.py", line 130, in wrapper
+    return self.method(cls_type, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/wynton/home/rotation/geanhu/software/caliby/envs/caliby/lib/python3.12/site-packages/lightning/pytorch/core/module.py", line 1796, in load_from_checkpoint
+    loaded = _load_from_checkpoint(
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/wynton/home/rotation/geanhu/software/caliby/envs/caliby/lib/python3.12/site-packages/lightning/pytorch/core/saving.py", line 65, in _load_from_checkpoint
+    checkpoint = pl_load(checkpoint_path, map_location=map_location, weights_only=weights_only)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/wynton/home/rotation/geanhu/software/caliby/envs/caliby/lib/python3.12/site-packages/lightning/fabric/utilities/cloud_io.py", line 73, in _load
+    return torch.load(
+           ^^^^^^^^^^^
+  File "/wynton/home/rotation/geanhu/software/caliby/envs/caliby/lib/python3.12/site-packages/torch/serialization.py", line 1610, in load
+    return _load(
+           ^^^^^^
+  File "/wynton/home/rotation/geanhu/software/caliby/envs/caliby/lib/python3.12/site-packages/torch/serialization.py", line 2221, in _load
+    result = unpickler.load()
+             ^^^^^^^^^^^^^^^^
+  File "/wynton/home/cbi/shared/software/CBI/miniforge3-24.7.1-0/lib/python3.12/pickle.py", line 1248, in load
+    dispatch[key[0]](self)
+  File "/wynton/home/cbi/shared/software/CBI/miniforge3-24.7.1-0/lib/python3.12/pickle.py", line 1289, in load_binpersid
+    self.append(self.persistent_load(pid))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/wynton/home/rotation/geanhu/software/caliby/envs/caliby/lib/python3.12/site-packages/torch/serialization.py", line 2185, in persistent_load
+    typed_storage = load_tensor(
+                    ^^^^^^^^^^^^
+  File "/wynton/home/rotation/geanhu/software/caliby/envs/caliby/lib/python3.12/site-packages/torch/serialization.py", line 2147, in load_tensor
+    wrap_storage = restore_location(storage, location)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/wynton/home/rotation/geanhu/software/caliby/envs/caliby/lib/python3.12/site-packages/torch/serialization.py", line 1958, in restore_location
+    result = default_restore_location(storage, location)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/wynton/home/rotation/geanhu/software/caliby/envs/caliby/lib/python3.12/site-packages/torch/serialization.py", line 734, in default_restore_location
+    result = fn(storage, location)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "/wynton/home/rotation/geanhu/software/caliby/envs/caliby/lib/python3.12/site-packages/torch/serialization.py", line 668, in _deserialize
+    return obj.to(device=device)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/wynton/home/rotation/geanhu/software/caliby/envs/caliby/lib/python3.12/site-packages/torch/storage.py", line 289, in to
+    return _to(self, device, non_blocking)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/wynton/home/rotation/geanhu/software/caliby/envs/caliby/lib/python3.12/site-packages/torch/_utils.py", line 93, in _to
+    with device_module.device(device):
+  File "/wynton/home/rotation/geanhu/software/caliby/envs/caliby/lib/python3.12/site-packages/torch/cuda/__init__.py", line 655, in __enter__
+    self.prev_idx = torch.cuda._exchange_device(self.idx)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/wynton/home/rotation/geanhu/software/caliby/envs/caliby/lib/python3.12/site-packages/torch/cuda/__init__.py", line 529, in _lazy_init
+    torch._C._cuda_init()
+RuntimeError: The NVIDIA driver on your system is too old (found version 12040). Please update your GPU driver by downloading and installing a new version from the URL: http://www.nvidia.com/Download/index.aspx Alternatively, go to: https://pytorch.org to install a PyTorch version that has been compiled with your version of the CUDA driver.
+
+Set the environment variable HYDRA_FULL_ERROR=1 for a complete stack trace.
+End: Fri Jul 24 11:05:38 PDT 2026

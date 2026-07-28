@@ -173,7 +173,7 @@ def main():
     for input in tqdm(inputs):
         pdb_fn1 = input
         pdb_fn2 = inputs[input]
-        out_fn = Path.joinpath(Path(args.input).parent, f'{Path(input).stem}_combined.pdb')
+        out_fn = Path.joinpath(Path(args.input).parent, 'combined', f'{Path(input).stem}_combined.pdb')
         combine_pdbs(
             pdb_fn1,
             pdb_fn2,
@@ -182,7 +182,7 @@ def main():
         outputs[f'{out_fn}'] = ''
     
     with open(Path.joinpath(Path(args.input).parent, f'{Path(args.input).stem}_combined.json'), 'w') as file:
-        json.dump(outputs, file)
+        json.dump(outputs, file, indent=4)
     
     print(f"Combined {len(outputs)} PDB files")
 
