@@ -2,16 +2,16 @@
 #$ -S /bin/bash
 #$ -q gpu.q
 #$ -pe smp 1
-#$ -l compute_cap=80,gpu_mem=40G
+#$ -l compute_cap=61,gpu_mem=6000M
 #$ -cwd
 #$ -N fold-array
 #$ -o logs/colabfold/$JOB_ID.log
 #$ -j y
-#$ -l h_rt=01:59:59
+#$ -l h_rt=01:55:00
 #$ -l mem_free=64G
 #$ -l scratch=16G
 #$ -l h=!qb3-idgpu18
-#$ -t 1-21
+#$ -t 1-20
 
 # metadata
 echo "Start: $(date)"
@@ -25,7 +25,7 @@ echo "-------End of script---------"
 export CUDA_VISIBLE_DEVICES=$SGE_GPU
 
 # array job
-batch_list="/wynton/home/rotation/geanhu/multi-state/data/caliby-output/5KPE-5KPH/temp10-2/filtered_seqs_batches.txt"
+batch_list="/wynton/home/rotation/geanhu/multi-state/data/mpnn-output/5KPE-5KPH_multi-state/temp3/filtered_seqs_batches.txt"
 BATCH_FILE=$(sed -n "${SGE_TASK_ID}p" "$batch_list")
 
 # run
@@ -35,7 +35,7 @@ exec colabfold_batch \
     --random-seed 42 \
     --num-seeds 3 \
     "$BATCH_FILE" \
-    /wynton/home/rotation/geanhu/multi-state/data/colabfold-output/5KPE-5KPH_caliby_multi-state/temp10-2/
+    /wynton/home/rotation/geanhu/multi-state/data/colabfold-output/5KPE-5KPH_multi-state/temp3/
 
 # end
 echo "End: $(date)"

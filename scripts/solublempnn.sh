@@ -6,7 +6,7 @@
 #$ -o logs/mpnn/$JOB_ID.log
 #$ -j y
 #$ -l h_rt=03:00:00
-#$ -l mem_free=16G
+#$ -l mem_free=32G
 #$ -l scratch=1G
 
 # metadata
@@ -21,13 +21,16 @@ echo "-------End of script---------"
 module load CBI miniforge3
 conda activate ligandmpnn
 
+# disable GPU
+export CUDA_VISIBLE_DEVICES=""
+
 # run
 python ~/software/LigandMPNN/run.py \
     --model_type "soluble_mpnn" \
     --checkpoint_soluble_mpnn "$HOME/software/LigandMPNN/model_params/solublempnn_v_48_002.pt" \
     --pdb_path_multi "/wynton/home/rotation/geanhu/multi-state/data/string-sampling/5KPE-5KPH_filtered_combined.json" \
     --out_folder "/wynton/home/rotation/geanhu/multi-state/data/mpnn-output/5KPE-5KPH_multi-state/temp3" \
-    --seed 42 \
+    --seed 44 \
     --temperature 0.3 \
     --omit_AA "CH" \
     --batch_size 1 \
