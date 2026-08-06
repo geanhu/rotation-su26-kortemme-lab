@@ -2,6 +2,8 @@ from pathlib import Path
 import json
 import argparse
 from tqdm import tqdm
+from concurrent.futures import ProcessPoolExecutor
+import os
 #
 import biotite.structure as struc
 import biotite.structure.io as strucio
@@ -25,23 +27,35 @@ def main():
     )
     args = parser.parse_args()
 
-    # store output
-    rmsds = {}
-
     # get inputs
     with open(args.input, 'r') as file:
         inputs = json.load(file)
+
+    # collect inputs for parallel processing
+    tasks = [(mobile, inputs[mobile], args.mode) for mobile in list(inputs.keys())]
+    try:
+            max_workers = int(os.environ.get('NSLOTS', os.cpu_count())) #type: ignore
+    except:
+        max_workers = 4 # dev nodes gives each user 4 slots, presumably
+    print(f'Using {max_workers} threads to process {len(tasks)} files')
     
-    import warnings
-    warnings.filterwarnings("ignore", category=UserWarning)
-    
-    # calculate
+    # calculate RMSD in parallel
+    with ProcessPoolExecutor(max_workers=max_workers) as executor:
+        rmsds = dict(
+            tqdm(
+                executor.map(worker, tasks),
+                total=len(tasks)
+            )
+        )
+    '''
+    Single thread
     for mobile in tqdm(list(inputs.keys())):
         rmsds[mobile] = float(calculate_rmsd(
             mobile,
             inputs[mobile],
             args.mode
         ))
+    '''
     
     # save output
     jsonpath = str(Path(args.input).parent) + f'/rmsd_{args.mode}_{Path(args.input).stem}.json'
@@ -49,11 +63,19 @@ def main():
         json.dump(rmsds, file, indent=4)
     print(f'Calculated RMSD of {len(rmsds)} structures with mode {args.mode} to {jsonpath}')
 
+def worker(args):
+    mobile, reference, mode = args
+    return mobile, float(calculate_rmsd(mobile, reference, mode))
+
 def calculate_rmsd(
     mobile: str,
     reference: str,
     mode: str
 ):
+    # ignore warnings about guessing elements
+    import warnings
+    warnings.filterwarnings("ignore", category=UserWarning)
+
     # load structures
     reference_struc: AtomArray = strucio.load_structure(reference) #type: ignore
     mobile_struc: AtomArray = strucio.load_structure(mobile) #type: ignore

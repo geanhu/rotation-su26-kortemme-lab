@@ -2,14 +2,14 @@
 #$ -S /bin/bash
 #$ -q gpu.q
 #$ -pe smp 1
-#$ -l compute_cap=80,gpu_mem=40G
+#$ -l compute_cap=61,gpu_mem=6000M
 #$ -cwd
 #$ -N fold
 #$ -o logs/colabfold/$JOB_ID.log
 #$ -j y
-#$ -l h_rt=12:00:00
+#$ -l h_rt=01:55:00
 #$ -l mem_free=64G
-#$ -l scratch=16G
+#$ -l scratch=32G
 #$ -l h=!qb3-idgpu18
 
 # metadata
@@ -29,8 +29,8 @@ exec colabfold_batch \
     --msa-mode single_sequence \
     --random-seed 42 \
     --num-seeds 3 \
-    $HOME/multi-state/data/mpnn-output/5KPE-5KPH_multi-state3/temp3/seqs/filtered-seqs.csv \
-    $HOME/multi-state/data/colabfold-output/5KPE-5KPH_multi-state3/temp3/
+    /wynton/home/rotation/geanhu/multi-state/data/mpnn-output/5KPE-5KPH_refined_multi-state3/temp1/incomplete-seqs2.csv \
+    /wynton/home/rotation/geanhu/multi-state/data/colabfold-output/5KPE-5KPH_refined_multi-state3/temp1/
 
 # end
 echo "End: $(date)"
