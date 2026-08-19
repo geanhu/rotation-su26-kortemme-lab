@@ -1,15 +1,15 @@
 #!/bin/bash
 #$ -S /bin/bash
-#$ -q gpu.q
+#$ -q long.q
 #$ -pe smp 1
-#$ -l compute_cap=61,gpu_mem=6000M
+##$ -l compute_cap=61,gpu_mem=6000M
 #$ -cwd
 #$ -N fold
 #$ -o logs/colabfold/$JOB_ID.log
 #$ -j y
-#$ -l h_rt=01:55:00
-#$ -l mem_free=64G
-#$ -l scratch=32G
+#$ -l h_rt=20:00:00
+#$ -l mem_free=16G
+#$ -l scratch=16G
 #$ -l h=!qb3-idgpu18
 
 # metadata
@@ -21,16 +21,17 @@ cat "$0"
 echo ""
 echo "-------End of script---------"
 
-export CUDA_VISIBLE_DEVICES=$SGE_GPU
+# disable GPU
+export CUDA_VISIBLE_DEVICES=""
 
 # run
 exec colabfold_batch \
     --num-recycle 3 \
     --msa-mode single_sequence \
     --random-seed 42 \
-    --num-seeds 3 \
-    /wynton/home/rotation/geanhu/multi-state/data/mpnn-output/5KPE-5KPH_refined_multi-state3/temp1/incomplete-seqs2.csv \
-    /wynton/home/rotation/geanhu/multi-state/data/colabfold-output/5KPE-5KPH_refined_multi-state3/temp1/
+    --num-seeds 1 \
+    /wynton/home/rotation/geanhu/multi-state/notebooks/data/mutants/5KPE-5KPH_2a.csv \
+    /wynton/home/rotation/geanhu/multi-state/data/colabfold-output/5KPE-5KPH_mutants/2a/
 
 # end
 echo "End: $(date)"

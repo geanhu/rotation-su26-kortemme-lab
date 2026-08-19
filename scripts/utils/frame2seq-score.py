@@ -3,6 +3,9 @@ from tqdm import tqdm
 from pathlib import Path
 import os
 import pandas as pd
+#
+from Bio.PDB.MMCIFParser import FastMMCIFParser
+from Bio.PDB.PDBIO import PDBIO
 from frame2seq import Frame2seqRunner
 
 def main():
@@ -12,7 +15,7 @@ def main():
     parser.add_argument(
         "input",
         type=str,
-        help="Path to folder of PDB files"
+        help="Path to folder of PDB files (.cif files will be converted to .pdb first)"
     )
     parser.add_argument(
         "output",
@@ -32,9 +35,27 @@ def main():
 
     # open input
     input = []
-    for file in Path(args.input).iterdir():
+    parser = FastMMCIFParser(QUIET=True) # we only care about structure coords, not annotations
+    io = PDBIO()
+    print('Parsing input PDBS ...')
+    for file in tqdm(list(Path(args.input).iterdir())):
+        # open pdb directly
         if file.suffix == '.pdb':
             input.append(str(file))
+
+        # if .cif -> need to convert to .pdb
+        # since Frame2Seq manually parses .pdb
+        if file.suffix == '.cif':
+            # skip conversion if exists
+            pdb_path = Path(file.parent, file.stem + '.pdb')
+            if pdb_path.exists():
+                continue
+
+            # else, convert
+            structure = parser.get_structure("structure", str(file))
+            io.set_structure(structure)
+            io.save(str(pdb_path))
+            input.append(str(pdb_path))
 
     # scoring
     print('Initializing Frame2Seq ...')

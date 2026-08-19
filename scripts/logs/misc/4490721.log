@@ -1,0 +1,72 @@
+Start: Tue Aug 11 05:20:48 PDT 2026
+qb3-id112.wynton.ucsf.edu
+==============================================================
+job_number:                 4490721
+exec_file:                  job_scripts/4490721
+submission_time:            Tue Aug 11 05:19:36 2026
+owner:                      geanhu
+uid:                        64854
+group:                      wynton-rotation
+gid:                        60001
+sge_o_home:                 /wynton/home/rotation/geanhu
+sge_o_log_name:             geanhu
+sge_o_path:                 /opt/sge/bin:/opt/sge/bin/lx-amd64:/wynton/home/rotation/geanhu/.vscode-server/data/User/globalStorage/github.copilot-chat/debugCommand:/wynton/home/rotation/geanhu/.vscode-server/data/User/globalStorage/github.copilot-chat/copilotCli:/wynton/home/rotation/geanhu/.vscode-server/cli/servers/Stable-e4c7e7b1d6d060162f4aa7f8225271b67ce1df75/server/bin/remote-cli:/opt/sge/bin:/opt/sge/bin/lx-amd64:/wynton/home/rotation/geanhu/.local/bin:/wynton/home/rotation/geanhu/bin:/opt/sge/bin:/opt/sge/bin/lx-amd64:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/wynton/home/ferrin/goddard/localcolabfold/localcolabfold/colabfold-conda/bin:/wynton/home/kortemme/xingjiepan/Softwares/Rosetta/Rosetta/main/source/bin:/wynton/home/ferrin/goddard/localcolabfold/localcolabfold/colabfold-conda/bin:/wynton/home/kortemme/xingjiepan/Softwares/Rosetta/Rosetta/main/source/bin:/wynton/home/rotation/geanhu/.vscode-server/extensions/ms-python.debugpy-2026.6.0-linux-x64/bundled/scripts/noConfigScripts
+sge_o_shell:                /bin/bash
+sge_o_workdir:              /wynton/home/rotation/geanhu/multi-state/scripts
+sge_o_host:                 log2
+account:                    sge
+cwd:                        /wynton/home/rotation/geanhu/multi-state/scripts
+merge:                      y
+hard resource_list:         h_rt=1800,mem_free=4G,scratch=1G
+mail_list:                  geanhu@log2
+notify:                     FALSE
+job_name:                   multi
+stdout_path_list:           NONE:NONE:logs/misc/$JOB_ID.log
+jobshare:                   0
+hard_queue_list:            short.q
+shell_list:                 NONE:/bin/bash
+env_list:                   TERM=NONE
+script_file:                multi-cpu.sh
+parallel environment:  smp range: 8
+project:                    wynton-rotation
+binding:                    NONE
+job_type:                   NONE
+usage         1:            cpu=00:00:00, mem=0.00000 GB s, io=0.00000 GB, vmem=N/A, maxvmem=N/A
+binding       1:            NONE
+scheduling info:            (Collecting of scheduler job information is turned off)
+------Start of script-------
+#!/bin/bash
+#$ -S /bin/bash
+#$ -q short.q
+#$ -cwd
+#$ -N multi
+#$ -o logs/misc/$JOB_ID.log
+#$ -j y
+#$ -l h_rt=00:30:00
+#$ -l mem_free=4G
+#$ -l scratch=1G
+#$ -pe smp 8
+
+# metadata
+echo "Start: $(date)"
+echo "$(hostname)"
+[[ -n "$JOB_ID" ]] && qstat -j "$JOB_ID"
+echo "------Start of script-------"
+cat "$0"
+echo "-------End of script---------"
+
+# setup env
+module load CBI miniforge3
+conda activate pyrosetta
+
+# run
+python /wynton/home/rotation/geanhu/multi-state/scripts/utils/colabfold-outputs-to-csv.py \
+    '/wynton/home/rotation/geanhu/multi-state/data/colabfold-output/5KPE-5KPH_refined_multi-state3/temp2'
+
+#end
+echo "End: $(date)"-------End of script---------
+Traceback (most recent call last):
+  File "/wynton/home/rotation/geanhu/multi-state/scripts/utils/colabfold-outputs-to-csv.py", line 3, in <module>
+    import orjson
+ModuleNotFoundError: No module named 'orjson'
+End: Tue Aug 11 05:20:51 PDT 2026

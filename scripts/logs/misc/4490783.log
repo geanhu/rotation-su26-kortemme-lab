@@ -1,0 +1,83 @@
+Start: Tue Aug 11 05:50:03 PDT 2026
+qb3-id292.wynton.ucsf.edu
+==============================================================
+job_number:                 4490783
+exec_file:                  job_scripts/4490783
+submission_time:            Tue Aug 11 05:48:04 2026
+owner:                      geanhu
+uid:                        64854
+group:                      wynton-rotation
+gid:                        60001
+sge_o_home:                 /wynton/home/rotation/geanhu
+sge_o_log_name:             geanhu
+sge_o_path:                 /opt/sge/bin:/opt/sge/bin/lx-amd64:/wynton/home/rotation/geanhu/.vscode-server/data/User/globalStorage/github.copilot-chat/debugCommand:/wynton/home/rotation/geanhu/.vscode-server/data/User/globalStorage/github.copilot-chat/copilotCli:/wynton/home/rotation/geanhu/.vscode-server/cli/servers/Stable-e4c7e7b1d6d060162f4aa7f8225271b67ce1df75/server/bin/remote-cli:/opt/sge/bin:/opt/sge/bin/lx-amd64:/wynton/home/rotation/geanhu/.local/bin:/wynton/home/rotation/geanhu/bin:/opt/sge/bin:/opt/sge/bin/lx-amd64:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/wynton/home/ferrin/goddard/localcolabfold/localcolabfold/colabfold-conda/bin:/wynton/home/kortemme/xingjiepan/Softwares/Rosetta/Rosetta/main/source/bin:/wynton/home/ferrin/goddard/localcolabfold/localcolabfold/colabfold-conda/bin:/wynton/home/kortemme/xingjiepan/Softwares/Rosetta/Rosetta/main/source/bin:/wynton/home/rotation/geanhu/.vscode-server/extensions/ms-python.debugpy-2026.6.0-linux-x64/bundled/scripts/noConfigScripts
+sge_o_shell:                /bin/bash
+sge_o_workdir:              /wynton/home/rotation/geanhu/multi-state/scripts
+sge_o_host:                 log2
+account:                    sge
+cwd:                        /wynton/home/rotation/geanhu/multi-state/scripts
+merge:                      y
+hard resource_list:         h_rt=1800,mem_free=4G,scratch=1G
+mail_list:                  geanhu@log2
+notify:                     FALSE
+job_name:                   multi
+stdout_path_list:           NONE:NONE:logs/misc/$JOB_ID.log
+jobshare:                   0
+hard_queue_list:            short.q
+shell_list:                 NONE:/bin/bash
+env_list:                   TERM=NONE
+script_file:                multi-cpu.sh
+parallel environment:  smp range: 8
+project:                    wynton-rotation
+binding:                    NONE
+job_type:                   NONE
+usage         1:            cpu=00:00:00, mem=0.00000 GB s, io=0.00000 GB, vmem=N/A, maxvmem=N/A
+binding       1:            NONE
+scheduling info:            (Collecting of scheduler job information is turned off)
+------Start of script-------
+#!/bin/bash
+#$ -S /bin/bash
+#$ -q short.q
+#$ -cwd
+#$ -N multi
+#$ -o logs/misc/$JOB_ID.log
+#$ -j y
+#$ -l h_rt=00:30:00
+#$ -l mem_free=4G
+#$ -l scratch=1G
+#$ -pe smp 8
+
+# metadata
+echo "Start: $(date)"
+echo "$(hostname)"
+[[ -n "$JOB_ID" ]] && qstat -j "$JOB_ID"
+echo "------Start of script-------"
+cat "$0"
+echo "-------End of script---------"
+
+# setup env
+module load CBI miniforge3
+conda activate analysis
+
+# run
+'''
+python /wynton/home/rotation/geanhu/multi-state/scripts/utils/rmsd-score.py \
+    '/wynton/home/rotation/geanhu/multi-state/data/colabfold-output/5KPE-5KPH_refined_multi-state3/temp3/rmsd_paths_end.json' \
+    --mode CA
+
+'''
+python /wynton/home/rotation/geanhu/multi-state/scripts/utils/colabfold-outputs-to-csv.py \
+    '/wynton/home/rotation/geanhu/multi-state/data/colabfold-output/5KPE-5KPH_refined_multi-state3/temp1'
+
+#end
+echo "End: $(date)"-------End of script---------
+/var/spool/sge/wynton/qb3-id292/job_scripts/4490783: line 31: 
+python /wynton/home/rotation/geanhu/multi-state/scripts/utils/rmsd-score.py \
+    /wynton/home/rotation/geanhu/multi-state/data/colabfold-output/5KPE-5KPH_refined_multi-state3/temp3/rmsd_paths_end.json \
+    --mode CA
+
+: No such file or directory
+Using 8 threads to process 2655 files
+Processing files:   0%|          | 0/2655 [00:00<?, ?it/s]Processing files:   1%|          | 26/2655 [00:00<00:10, 241.37it/s]Processing files:   2%|▏         | 51/2655 [00:00<00:27, 96.27it/s] Processing files:   3%|▎         | 71/2655 [00:00<00:22, 114.05it/s]Processing files:   3%|▎         | 86/2655 [00:01<00:36, 70.54it/s] Processing files:   4%|▎         | 97/2655 [00:01<00:33, 75.85it/s]Processing files:   4%|▍         | 110/2655 [00:01<00:33, 75.76it/s]Processing files:   5%|▍         | 125/2655 [00:01<00:34, 72.82it/s]Processing files:   5%|▌         | 138/2655 [00:01<00:39, 64.27it/s]Processing files:   6%|▌         | 162/2655 [00:01<00:27, 90.59it/s]Processing files:   7%|▋         | 174/2655 [00:02<00:39, 63.03it/s]Processing files:   7%|▋         | 192/2655 [00:02<00:31, 78.20it/s]Processing files:   8%|▊         | 210/2655 [00:02<00:26, 92.81it/s]Processing files:   8%|▊         | 223/2655 [00:02<00:26, 91.39it/s]Processing files:   9%|▉         | 235/2655 [00:02<00:31, 77.49it/s]Processing files:   9%|▉         | 249/2655 [00:03<00:30, 77.67it/s]Processing files:  10%|▉         | 258/2655 [00:03<00:30, 79.39it/s]Processing files:  10%|█         | 276/2655 [00:03<00:24, 96.60it/s]Processing files:  11%|█         | 287/2655 [00:03<00:31, 75.75it/s]Processing files:  11%|█▏        | 299/2655 [00:03<00:29, 79.25it/s]Processing files:  12%|█▏        | 308/2655 [00:03<00:31, 74.46it/s]Processing files:  12%|█▏        | 327/2655 [00:03<00:25, 90.26it/s]Processing files:  13%|█▎        | 341/2655 [00:04<00:25, 89.18it/s]Processing files:  14%|█▎        | 360/2655 [00:04<00:21, 106.69it/s]Processing files:  14%|█▍        | 376/2655 [00:04<00:19, 116.26it/s]Processing files:  15%|█▍        | 389/2655 [00:04<00:26, 84.51it/s] Processing files:  15%|█▌        | 400/2655 [00:04<00:38, 59.33it/s]Processing files:  16%|█▌        | 426/2655 [00:05<00:25, 86.38it/s]Processing files:  17%|█▋        | 440/2655 [00:05<00:29, 74.06it/s]Processing files:  19%|█▊        | 493/2655 [00:05<00:14, 145.33it/s]Processing files:  19%|█▉        | 514/2655 [00:05<00:16, 127.65it/s]Processing files:  20%|██        | 532/2655 [00:06<00:24, 85.46it/s] Processing files:  21%|██        | 554/2655 [00:06<00:20, 100.38it/s]Processing files:  21%|██▏       | 569/2655 [00:06<00:24, 84.39it/s] Processing files:  22%|██▏       | 587/2655 [00:06<00:22, 91.63it/s]Processing files:  23%|██▎       | 606/2655 [00:07<00:36, 56.60it/s]Processing files:  25%|██▍       | 654/2655 [00:07<00:20, 96.13it/s]Processing files:  25%|██▌       | 676/2655 [00:07<00:20, 97.16it/s]Processing files:  26%|██▌       | 692/2655 [00:07<00:19, 103.00it/s]Processing files:  27%|██▋       | 706/2655 [00:08<00:24, 79.53it/s] Processing files:  27%|██▋       | 717/2655 [00:08<00:24, 79.69it/s]Processing files:  28%|██▊       | 732/2655 [00:08<00:23, 80.93it/s]Processing files:  28%|██▊       | 742/2655 [00:08<00:26, 70.86it/s]Processing files:  29%|██▉       | 764/2655 [00:08<00:24, 77.39it/s]Processing files:  29%|██▉       | 773/2655 [00:09<00:59, 31.82it/s]Processing files:  33%|███▎      | 864/2655 [00:10<00:17, 100.64it/s]Processing files:  33%|███▎      | 884/2655 [00:10<00:18, 98.03it/s] Processing files:  35%|███▍      | 918/2655 [00:10<00:14, 122.44it/s]Processing files:  35%|███▌      | 938/2655 [00:10<00:13, 128.34it/s]Processing files:  36%|███▌      | 957/2655 [00:10<00:13, 129.43it/s]Processing files:  37%|███▋      | 975/2655 [00:10<00:12, 132.08it/s]Processing files:  37%|███▋      | 993/2655 [00:11<00:12, 132.88it/s]Processing files:  38%|███▊      | 1009/2655 [00:11<00:21, 78.02it/s]Processing files:  39%|███▉      | 1032/2655 [00:11<00:17, 90.44it/s]Processing files:  40%|███▉      | 1060/2655 [00:11<00:14, 113.69it/s]Processing files:  41%|████      | 1081/2655 [00:11<00:12, 130.38it/s]Processing files:  41%|████▏     | 1098/2655 [00:12<00:13, 119.76it/s]Processing files:  42%|████▏     | 1113/2655 [00:12<00:14, 107.02it/s]Processing files:  43%|████▎     | 1142/2655 [00:12<00:12, 123.79it/s]Processing files:  44%|████▎     | 1156/2655 [00:12<00:15, 97.96it/s] Processing files:  44%|████▍     | 1180/2655 [00:12<00:12, 122.30it/s]Processing files:  45%|████▌     | 1195/2655 [00:12<00:12, 121.45it/s]Processing files:  46%|████▌     | 1209/2655 [00:13<00:15, 96.04it/s] Processing files:  46%|████▋     | 1232/2655 [00:13<00:13, 103.06it/s]Processing files:  47%|████▋     | 1244/2655 [00:13<00:18, 76.53it/s] Processing files:  48%|████▊     | 1280/2655 [00:13<00:14, 95.07it/s]Processing files:  50%|████▉     | 1315/2655 [00:14<00:10, 131.92it/s]Processing files:  50%|█████     | 1332/2655 [00:14<00:12, 107.57it/s]Processing files:  51%|█████     | 1360/2655 [00:14<00:11, 115.34it/s]Processing files:  52%|█████▏    | 1388/2655 [00:14<00:09, 129.40it/s]Processing files:  53%|█████▎    | 1413/2655 [00:15<00:12, 96.30it/s] Processing files:  54%|█████▎    | 1426/2655 [00:15<00:23, 51.23it/s]Processing files:  58%|█████▊    | 1551/2655 [00:16<00:06, 159.22it/s]Processing files:  60%|█████▉    | 1591/2655 [00:16<00:07, 135.67it/s]Processing files:  61%|██████    | 1622/2655 [00:16<00:07, 130.59it/s]Processing files:  62%|██████▏   | 1647/2655 [00:16<00:07, 126.98it/s]Processing files:  63%|██████▎   | 1681/2655 [00:17<00:07, 137.00it/s]Processing files:  64%|██████▍   | 1701/2655 [00:17<00:06, 139.92it/s]Processing files:  65%|██████▍   | 1720/2655 [00:17<00:08, 111.54it/s]Processing files:  65%|██████▌   | 1735/2655 [00:17<00:09, 96.38it/s] Processing files:  66%|██████▋   | 1761/2655 [00:18<00:10, 82.59it/s]Processing files:  68%|██████▊   | 1798/2655 [00:18<00:07, 115.94it/s]Processing files:  68%|██████▊   | 1815/2655 [00:18<00:07, 119.53it/s]Processing files:  69%|██████▉   | 1835/2655 [00:18<00:06, 131.57it/s]Processing files:  70%|██████▉   | 1852/2655 [00:18<00:06, 124.14it/s]Processing files:  70%|███████   | 1870/2655 [00:18<00:05, 134.29it/s]Processing files:  71%|███████   | 1886/2655 [00:19<00:07, 101.02it/s]Processing files:  72%|███████▏  | 1905/2655 [00:19<00:06, 117.05it/s]Processing files:  72%|███████▏  | 1922/2655 [00:19<00:05, 127.23it/s]Processing files:  73%|███████▎  | 1938/2655 [00:19<00:06, 104.92it/s]Processing files:  74%|███████▍  | 1961/2655 [00:19<00:05, 125.23it/s]Processing files:  75%|███████▍  | 1981/2655 [00:19<00:06, 97.79it/s] Processing files:  76%|███████▌  | 2022/2655 [00:20<00:04, 144.11it/s]Processing files:  77%|███████▋  | 2040/2655 [00:20<00:04, 135.28it/s]Processing files:  77%|███████▋  | 2056/2655 [00:20<00:05, 101.57it/s]Processing files:  78%|███████▊  | 2081/2655 [00:20<00:05, 101.52it/s]Processing files:  80%|████████  | 2124/2655 [00:20<00:03, 154.15it/s]Processing files:  81%|████████  | 2149/2655 [00:21<00:02, 170.33it/s]Processing files:  82%|████████▏ | 2171/2655 [00:21<00:03, 124.02it/s]Processing files:  82%|████████▏ | 2189/2655 [00:21<00:04, 109.06it/s]Processing files:  84%|████████▎ | 2220/2655 [00:21<00:03, 139.77it/s]Processing files:  84%|████████▍ | 2239/2655 [00:21<00:02, 143.35it/s]Processing files:  85%|████████▌ | 2259/2655 [00:21<00:02, 154.49it/s]Processing files:  86%|████████▌ | 2278/2655 [00:22<00:02, 149.53it/s]Processing files:  86%|████████▋ | 2295/2655 [00:22<00:02, 123.45it/s]Processing files:  88%|████████▊ | 2326/2655 [00:22<00:03, 104.92it/s]Processing files:  89%|████████▉ | 2358/2655 [00:22<00:02, 138.09it/s]Processing files:  90%|█████████ | 2394/2655 [00:22<00:01, 178.56it/s]Processing files:  91%|█████████ | 2418/2655 [00:23<00:01, 165.60it/s]Processing files:  92%|█████████▏| 2441/2655 [00:23<00:01, 173.42it/s]Processing files:  93%|█████████▎| 2462/2655 [00:23<00:01, 115.31it/s]Processing files:  94%|█████████▎| 2486/2655 [00:23<00:01, 131.44it/s]Processing files:  94%|█████████▍| 2504/2655 [00:23<00:01, 101.74it/s]Processing files:  96%|█████████▌| 2537/2655 [00:24<00:00, 122.17it/s]Processing files:  96%|█████████▌| 2552/2655 [00:24<00:00, 109.22it/s]Processing files:  98%|█████████▊| 2591/2655 [00:24<00:00, 125.65it/s]Processing files:  99%|█████████▉| 2632/2655 [00:24<00:00, 171.09it/s]Processing files: 100%|█████████▉| 2654/2655 [00:24<00:00, 178.25it/s]Processing files: 100%|██████████| 2655/2655 [00:24<00:00, 107.26it/s]
+Wrote scores for 2655 structures to /wynton/home/rotation/geanhu/multi-state/data/colabfold-output/5KPE-5KPH_refined_multi-state3/temp1/scores.csv
+End: Tue Aug 11 05:50:39 PDT 2026

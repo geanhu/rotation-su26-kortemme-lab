@@ -26,7 +26,7 @@ def main():
     with open(jsonpath, 'w') as file:
         json.dump(pdbs, file, indent=4)
     
-    print(f'Wrote paths of {len(pdbs)} to {jsonpath}')
+    print(f'Wrote paths of {len(pdbs)} .pdb files to {jsonpath}')
 
 
 if __name__ == "__main__":

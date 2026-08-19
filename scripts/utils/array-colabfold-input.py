@@ -16,7 +16,7 @@ def main():
     parser.add_argument(
         "--chunk_size",
         type=int,
-        default=150, # reduced from 200, since seems to time out on some nodes
+        default=130, # reduced from 200, since seems to time out on some nodes
         help='Maximum number of sequences to input per array job'
     )
     args = parser.parse_args()

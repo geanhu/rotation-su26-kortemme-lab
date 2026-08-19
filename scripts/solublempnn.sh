@@ -28,15 +28,15 @@ export CUDA_VISIBLE_DEVICES=""
 python ~/software/LigandMPNN/run.py \
     --model_type "soluble_mpnn" \
     --checkpoint_soluble_mpnn "$HOME/software/LigandMPNN/model_params/solublempnn_v_48_002.pt" \
-    --pdb_path_multi "/wynton/home/rotation/geanhu/multi-state/data/string-sampling/5KPE-5KPH_filtered_combined.json" \
-    --out_folder "/wynton/home/rotation/geanhu/multi-state/data/mpnn-output/5KPE-5KPH_multi-state/temp3" \
-    --seed 44 \
+    --pdb_path_multi "/wynton/home/rotation/geanhu/multi-state/data/diffusion-output/5KPH-4a/pdb/pdb.json" \
+    --out_folder "/wynton/home/rotation/geanhu/multi-state/data/mpnn-output/5KPH-4a_refined/" \
+    --seed 42 \
     --temperature 0.3 \
     --omit_AA "CH" \
     --batch_size 1 \
-    --number_of_batches 24 \
-    --bias_AA 'A:-0.5,E:-0.25,K:-0.25' \
-    --homo_oligomer 1
+    --number_of_batches 8 \
+    --bias_AA 'A:-0.5,E:-0.25,K:-0.25'
+    #--homo_oligomer 1
 
 #end
 echo "End: $(date)"

@@ -1,0 +1,70 @@
+Start: Thu Aug  6 17:05:45 PDT 2026
+qb3-id306.wynton.ucsf.edu
+==============================================================
+job_number:                 4426849
+exec_file:                  job_scripts/4426849
+submission_time:            Thu Aug  6 17:05:12 2026
+owner:                      geanhu
+uid:                        64854
+group:                      wynton-rotation
+gid:                        60001
+sge_o_home:                 /wynton/home/rotation/geanhu
+sge_o_log_name:             geanhu
+sge_o_path:                 /wynton/home/cbi/shared/software/CBI/miniforge3-26.3.2-2/condabin:/wynton/home/cbi/shared/software/CBI/miniforge3-26.3.2-2/bin:/wynton/home/rotation/geanhu/.local/bin:/wynton/home/rotation/geanhu/bin:/opt/sge/bin:/opt/sge/bin/lx-amd64:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/wynton/home/ferrin/goddard/localcolabfold/localcolabfold/colabfold-conda/bin:/wynton/home/kortemme/xingjiepan/Softwares/Rosetta/Rosetta/main/source/bin
+sge_o_shell:                /bin/bash
+sge_o_workdir:              /wynton/home/rotation/geanhu/multi-state/scripts
+sge_o_host:                 dev3
+account:                    sge
+cwd:                        /wynton/home/rotation/geanhu/multi-state/scripts
+merge:                      y
+hard resource_list:         h_rt=1800,mem_free=8G,scratch=1G
+mail_list:                  geanhu@dev3.wynton.ucsf.edu
+notify:                     FALSE
+job_name:                   multi
+stdout_path_list:           NONE:NONE:logs/misc/$JOB_ID.log
+jobshare:                   0
+hard_queue_list:            short.q
+shell_list:                 NONE:/bin/bash
+env_list:                   TERM=NONE
+script_file:                multi-cpu.sh
+parallel environment:  smp range: 8
+project:                    wynton-rotation
+binding:                    NONE
+job_type:                   NONE
+usage         1:            cpu=00:00:00, mem=0.00000 GB s, io=0.00000 GB, vmem=N/A, maxvmem=N/A
+binding       1:            NONE
+scheduling info:            (Collecting of scheduler job information is turned off)
+------Start of script-------
+#!/bin/bash
+#$ -S /bin/bash
+#$ -q short.q
+#$ -cwd
+#$ -N multi
+#$ -o logs/misc/$JOB_ID.log
+#$ -j y
+#$ -l h_rt=00:30:00
+#$ -l mem_free=8G
+#$ -l scratch=1G
+#$ -pe smp 8
+
+# metadata
+echo "Start: $(date)"
+echo "$(hostname)"
+[[ -n "$JOB_ID" ]] && qstat -j "$JOB_ID"
+echo "------Start of script-------"
+cat "$0"
+echo "-------End of script---------"
+
+# setup env
+module load CBI miniforge3
+conda activate pyrosetta
+
+# run
+python ~/multi-state/scripts/utils/pyrosetta-fastrelax-sidechains-score.py \
+    '/wynton/home/rotation/geanhu/multi-state/data/mpnn-output/5KPE-5KPH_multi-state/temp1/backbones' \
+    '/wynton/home/rotation/geanhu/multi-state/data/pyrosetta-output/5KPE-5KPH_multi-state/temp1'
+
+#end
+echo "End: $(date)"-------End of script---------
+Using 8 threads to process 4128 files
+  0%|          | 0/4128 [00:00<?, ?it/s]  0%|          | 1/4128 [00:58<66:36:41, 58.11s/it]  0%|          | 2/4128 [01:03<31:16:09, 27.28s/it]  0%|          | 5/4128 [01:18<12:53:31, 11.26s/it]  0%|          | 6/4128 [01:27<12:06:22, 10.57s/it]  0%|          | 9/4128 [02:02<12:44:28, 11.14s/it]  0%|          | 15/4128 [02:08<5:48:19,  5.08s/it]  0%|          | 17/4128 [02:11<4:57:07,  4.34s/it]  0%|          | 18/4128 [02:19<5:27:34,  4.78s/it]  1%|          | 22/4128 [02:27<4:06:58,  3.61s/it]  1%|          | 23/4128 [02:45<6:23:33,  5.61s/it]  1%|          | 24/4128 [02:47<5:36:52,  4.93s/it]  1%|          | 29/4128 [02:58<3:57:52,  3.48s/it]  1%|          | 30/4128 [03:08<4:52:48,  4.29s/it]  1%|          | 31/4128 [03:09<4:22:58,  3.85s/it]  1%|          | 33/4128 [03:27<6:10:39,  5.43s/it]  1%|          | 37/4128 [03:40<5:03:27,  4.45s/it]  1%|          | 39/4128 [03:50<5:06:44,  4.50s/it]  1%|          | 43/4128 [04:03<4:33:51,  4.02s/it]  1%|          | 44/4128 [04:07<4:30:11,  3.97s/it]  1%|          | 45/4128 [04:09<4:14:57,  3.75s/it]  1%|          | 47/4128 [04:15<3:58:34,  3.51s/it]  1%|          | 48/4128 [04:19<4:03:58,  3.59s/it]  1%|          | 50/4128 [04:42<7:04:37,  6.25s/it]  1%|▏         | 52/4128 [04:45<5:18:33,  4.69s/it]  1%|▏         | 53/4128 [04:52<5:47:32,  5.12s/it]  1%|▏         | 55/4128 [04:53<3:58:38,  3.52s/it]  1%|▏         | 56/4128 [05:09<6:54:09,  6.10s/it]  1%|▏         | 58/4128 [05:20<6:29:12,  5.74s/it]  1%|▏         | 60/4128 [05:25<5:19:25,  4.71s/it]  2%|▏         | 63/4128 [05:36<4:48:04,  4.25s/it]  2%|▏         | 66/4128 [05:48<4:37:49,  4.10s/it]  2%|▏         | 67/4128 [05:58<5:46:16,  5.12s/it]  2%|▏         | 69/4128 [06:10<5:56:29,  5.27s/it]  2%|▏         | 73/4128 [06:30<5:50:05,  5.18s/it]  2%|▏         | 79/4128 [06:47<4:32:43,  4.04s/it]  2%|▏         | 81/4128 [06:53<4:18:33,  3.83s/it]  2%|▏         | 86/4128 [07:33<6:13:59,  5.55s/it]  2%|▏         | 90/4128 [07:42<4:59:20,  4.45s/it]  2%|▏         | 95/4128 [07:46<3:32:13,  3.16s/it]  2%|▏         | 96/4128 [07:53<3:56:50,  3.52s/it]  2%|▏         | 99/4128 [07:55<2:59:34,  2.67s/it]  2%|▏         | 100/4128 [08:03<3:40:36,  3.29s/it]  2%|▏         | 102/4128 [08:26<6:03:04,  5.41s/it]  3%|▎         | 104/4128 [08:30<5:00:39,  4.48s/it]  3%|▎         | 110/4128 [08:52<4:30:37,  4.04s/it]  3%|▎         | 114/4128 [09:20<5:38:53,  5.07s/it]  3%|▎         | 116/4128 [09:20<4:35:40,  4.12s/it]  3%|▎         | 121/4128 [09:35<4:00:15,  3.60s/it]  3%|▎         | 124/4128 [09:51<4:35:00,  4.12s/it]  3%|▎         | 126/4128 [09:57<4:15:04,  3.82s/it]  3%|▎         | 127/4128 [09:58<3:56:30,  3.55s/it]  3%|▎         | 129/4128 [10:07<4:07:26,  3.71s/it]  3%|▎         | 130/4128 [10:19<5:33:43,  5.01s/it]  3%|▎         | 133/4128 [10:25<4:16:24,  3.85s/it]  3%|▎         | 136/4128 [10:43<5:10:14,  4.66s/it]  3%|▎         | 139/4128 [10:56<5:00:42,  4.52s/it]  3%|▎         | 140/4128 [10:57<4:32:03,  4.09s/it]
