@@ -28,8 +28,8 @@ export CUDA_VISIBLE_DEVICES=""
 python ~/software/LigandMPNN/run.py \
     --model_type "soluble_mpnn" \
     --checkpoint_soluble_mpnn "$HOME/software/LigandMPNN/model_params/solublempnn_v_48_002.pt" \
-    --pdb_path_multi "/wynton/home/rotation/geanhu/multi-state/data/diffusion-output/5KPH-4a/pdb/pdb.json" \
-    --out_folder "/wynton/home/rotation/geanhu/multi-state/data/mpnn-output/5KPH-4a_refined/" \
+    --pdb_path_multi "/wynton/home/rotation/geanhu/multi-state/data/string-sampling/5KPH-4a/5KPH-4a.json" \
+    --out_folder "/wynton/home/rotation/geanhu/multi-state/data/mpnn-output/5KPH-4a/" \
     --seed 42 \
     --temperature 0.3 \
     --omit_AA "CH" \

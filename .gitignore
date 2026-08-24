@@ -2,3 +2,5 @@ data/
 scripts/outputs/
 scripts/utils/scratch.py
 notebooks/.ipynb_checkpoints/
+!notebooks/data
+!notebooks/data/data

@@ -1,14 +1,16 @@
 #!/bin/bash
 #$ -S /bin/bash
-#$ -q long.q
+#$ -q gpu.q
 #$ -cwd
+#$ -l compute_cap=61,gpu_mem=6000M
 #$ -N conf-bias
 #$ -o logs/conf-bias/$JOB_ID.log
 #$ -j y
-#$ -l h_rt=08:00:00
-#$ -l mem_free=8G
-#$ -l scratch=1G
-#$ -pe smp 4
+#$ -l h_rt=24:00:00
+#$ -l mem_free=16G
+#$ -l scratch=8G
+#$ -l h=!qb3-idgpu18
+#$ -pe smp 1
 
 # metadata
 echo "Start: $(date)"
@@ -24,12 +26,27 @@ module load CBI miniforge3
 conda activate conf-bias
 
 # disable GPU
-export CUDA_VISIBLE_DEVICES=""
+#export CUDA_VISIBLE_DEVICES=""
+
+# enable GPU
+export CUDA_VISIBLE_DEVICES=$SGE_GPU
+
+# set local scratch
+if [[ -z "$TMPDIR" ]]; then
+  if [[ -d /scratch ]]; then TMPDIR=/scratch/$USER; else TMPDIR=/tmp/$USER; fi
+  mkdir -p "$TMPDIR"
+  export TMPDIR
+fi
+
+# for caliby
+export PDB_MIRROR_PATH=""
+export CCD_MIRROR_PATH=""
+export MODEL_PARAMS_DIR="/wynton/home/rotation/geanhu/software/caliby/model_params"
 
 # run
 python ~/multi-state/scripts/utils/conformational-biasing.py \
     '/wynton/home/rotation/geanhu/multi-state/data/conf-bias-output/5KPE-5KPH/designs.json' \
-    --proteinmpnn
+    --caliby
 
 #end
 echo "End: $(date)"

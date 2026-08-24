@@ -6,6 +6,7 @@ import os
 #
 from concurrent.futures import ThreadPoolExecutor
 from threading import local
+from tempfile import TemporaryDirectory
 #
 import pandas as pd
 from tqdm import tqdm
@@ -35,6 +36,12 @@ def main():
         "input",
         type=str,
         help="Path to input .json, expecting key = name, value = [path/to/state/A.pdb, path/to/state/B.pdb]; only uses state A sequence"
+    )
+    parser.add_argument(
+        '--chain',
+        type=str,
+        default='A',
+        help='Chain of input structure to use'
     )
 
     # ProteinMPNN arguments
@@ -85,13 +92,12 @@ def main():
         action='store_true',
         help='Run CB with Frame2Seq as IF model'
     )
-    args = parser.parse_args()
 
     # Caliby
     parser.add_argument(
         '--caliby',
         action='store_true',
-        help='Run CB with Caliby as IF model'
+        help='Run CB with Caliby as IF model; make sure to set $TMPDIR before running'
     )
 
     parser.add_argument(
@@ -108,8 +114,13 @@ def main():
         help='Caliby model to use'
     )
 
+    # parse
+    args = parser.parse_args()
+
     # determine multi-threading settings
     max_workers = int(os.environ.get('NSLOTS') or 4)
+    if os.environ.get("CUDA_VISIBLE_DEVICES") != "":
+        max_workers = 1
     print(f'Using {max_workers} threads ...')
 
     # must run a model
@@ -122,7 +133,7 @@ def main():
     n_inputs = len(inputs)
 
     # align sequences and make mutants
-    inputs = preprocess_inputs(inputs)
+    inputs = preprocess_inputs(inputs, args.chain)
 
     # run each model
     methods = []
@@ -131,7 +142,8 @@ def main():
         outputs.append(proteinmpnn(
             inputs,
             args.model_name, args.backbone_noise, args.weights,
-            max_workers
+            max_workers,
+            args.chain
         ))
         methods += 'proteinmpnn'
     if args.esm:
@@ -140,14 +152,16 @@ def main():
     if args.frame2seq:
         outputs.append(frame2seq(
             inputs,
-            max_workers
+            max_workers,
+            args.chain
         ))
         methods += 'frame2seq'
     if args.caliby:
         outputs.append(caliby(
             inputs,
             args.caliby_model,
-            max_workers
+            max_workers,
+            args.chain
         ))
         methods += 'caliby'
     methods = '-'.join(methods)
@@ -175,7 +189,8 @@ def main():
 #---- Preprocess inputs
 
 def preprocess_inputs(
-    inputs: dict
+    inputs: dict,
+    chain: str
 ):
     print('Preprocessing inputs ...')
     
@@ -191,7 +206,7 @@ def preprocess_inputs(
         (e.g. start state) without threading sequence design. (Model only
         uses backbone anyways)
         '''
-        wt_seq = get_seq(pdbs[0], 'A') 
+        wt_seq = get_seq(pdbs[0], chain) 
 
         # create list of mutants
         muts = []
@@ -233,7 +248,8 @@ def get_seq(pdbpath, chain):
 def proteinmpnn(
     inputs,
     model_name, backbone_noise, weights,
-    max_workers: int
+    max_workers: int,
+    chain
 ):
     
     # only import if using
@@ -269,7 +285,7 @@ def proteinmpnn(
             # load structure model
             mpnn_model.prep_inputs(
                 pdb_filename=pdb,
-                chain='A',
+                chain=chain,
                 homooligomer=False,
                 fix_pos=None,
                 inverse=True, #not sure what this set true by default means, esp if no fix pos
@@ -328,7 +344,8 @@ def esm(inputs):
 
 def frame2seq(
     inputs,
-    max_workers: int
+    max_workers: int,
+    chain
 ):
     # only import if using
     print('Initializing Frame2Seq ...')
@@ -439,7 +456,8 @@ def frame2seq(
             scores = frame2seq_score(
                 runner,
                 pdb,
-                [inputs[name]['wt']] + inputs[name]['mutant_seqs']
+                [inputs[name]['wt']] + inputs[name]['mutant_seqs'],
+                chain
             )
 
             # save wt score
@@ -481,10 +499,13 @@ def frame2seq(
 def caliby(
     inputs,
     model: str,
-    max_workers: int
+    max_workers: int,
+    chain: str
 ):
     print('Initializing Caliby ...')
     from caliby import load_model
+    import biotite.structure as struc
+    import biotite.structure.io.pdb as pdbio
 
     # set threading
     thread_local = local()
@@ -493,6 +514,32 @@ def caliby(
     def init_worker():
         thread_local.caliby_model = load_model(
             model
+        )
+    
+    # utility for writing pdb files
+    def create_pdb(
+        backbone,
+        sequence: str,
+        destpath: str
+    ):
+        # create new structure
+        output = backbone.copy()
+
+        # start of residue
+        residue_starts = struc.get_residue_starts(output, add_exclusive_stop=True)
+        assert (len(sequence) + 1) == len(residue_starts), f'Sequence is {len(sequence)} long, but structure is {len(residue_starts)} long for {destpath}'
+
+        # annotate residue
+        for i, one_letter in enumerate(sequence):
+            three_letter = aa_code[one_letter.upper()]
+            start = residue_starts[i]
+            end = residue_starts[i + 1]
+            output.res_name[start:end] = three_letter
+        
+        # write file
+        strucio.save_structure(
+            destpath,
+            output
         )
 
     # prediction for one input
@@ -508,20 +555,92 @@ def caliby(
             ]
         ] #list of {'name', 'mut'} dicts
 
-        # score for each state
-        for i, pdb in enumerate(inputs[name]['pdbs']):
-            # TODO
-            # create temp directory to write pdbs to
-            # ---
-            # score as batch
-            # ----
-            # subtract wt score
-            # parse batched results back into correct format
+        # create temp directory to write pdbs to
+        with TemporaryDirectory(
+            prefix=f'caliby_{name}',
+            # create files in machine scratch to minimize file I/O time
+            dir=os.environ.get("TMPDIR")
+        ) as tmpdir:
+                    
+            # score for each state
+            for i, pdb in enumerate(inputs[name]['pdbs']):
+
+                # read structure
+                backbone = strucio.load_structure(
+                    pdb
+                ) # assume single model
+
+                # get desired chain only
+                backbone = backbone[backbone.chain_id == chain] #type: ignore
+
+                pdb_list = []
+                # create files for all sequences
+                for seq_i, sequence in enumerate(
+                    [inputs[name]['wt']] + 
+                    inputs[name]['mutant_seqs']
+                ):
+                    destpath = str(Path(
+                        tmpdir,
+                        f"seq{seq_i}.pdb"
+                    ))
+                    create_pdb(
+                        backbone,
+                        sequence,
+                        destpath
+                    )
+                    pdb_list.append(
+                        destpath
+                    )
+                
+                # score as batch
+                scores = caliby_model.score(
+                    pdb_list
+                )
+                scores = pd.DataFrame(scores).set_index('example_id')
+
+                # save wt score
+                wt_score = float(scores.loc['seq0', 'U']) #type: ignore
+                rows[0][f'caliby_pdb{i}'] = wt_score
+
+                # subtract wt score
+                scores = scores.drop('seq0')
+                scores['U'] = scores['U'] - wt_score
+
+                # parse batched results back into correct format
+                for idx, mut in enumerate(inputs[name]['mutants']):
+                    rows[idx + 1][f'caliby_pdb{i}'] = (
+                        float(scores.loc[f'seq{idx + 1}', 'U']) #type: ignore
+                    )
+
+                # delete files
+                for path in pdb_list:
+                    Path(path).unlink()
+
             # return results
+            return rows
 
-    # TODO actually call the workers
+    # distribute and execute each worker
+    print('Scoring with Caliby ...')
+    names = list(inputs)
+    with ThreadPoolExecutor(
+        max_workers = max_workers,
+        initializer = init_worker,
+    ) as executor:
+        results = list(
+            tqdm(
+                executor.map(worker, names),
+                total = len(names)
+            )
+        )
 
-    # TODO return results in correct format for df merging
+    # unpack one level of lists to create long df
+    results = [
+        row
+        for result in results # each input
+        for row in result # each mutant
+    ]
+
+    return pd.DataFrame(results)
 
 if __name__ == "__main__":
     main()
