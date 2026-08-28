@@ -34,7 +34,7 @@ def main():
     # collect inputs for parallel processing
     tasks = [(mobile, inputs[mobile], args.mode) for mobile in list(inputs.keys())]
     try:
-            max_workers = int(os.environ.get('NSLOTS', os.cpu_count())) #type: ignore
+        max_workers = int(os.environ['NSLOTS']) #type: ignore
     except:
         max_workers = 4 # dev nodes gives each user 4 slots, presumably
     print(f'Using {max_workers} threads to process {len(tasks)} files')
